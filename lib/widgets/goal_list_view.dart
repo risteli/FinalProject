@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../models/data.dart' as data;
+import '../models/fixture.dart' as data;
 import '../models/models.dart';
-import 'email_widget.dart';
+import 'goal_widget.dart';
 import 'search_bar.dart' as search_bar;
 
-class EmailListView extends StatelessWidget {
-  const EmailListView({
+class GoalListView extends StatelessWidget {
+  const GoalListView({
     super.key,
     this.selectedIndex,
     this.onSelected,
@@ -24,15 +24,15 @@ class EmailListView extends StatelessWidget {
       child: ListView(
         children: [
           const SizedBox(height: 8),
-          search_bar.SearchBar(currentUser: currentUser),
+          search_bar.SearchBar(),
           const SizedBox(height: 8),
           ...List.generate(
-            data.emails.length,
+            data.goals.length,
                 (index) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: EmailWidget(
-                  email: data.emails[index],
+                child: GoalWidget(
+                  goal: data.goals[index],
                   onSelected: onSelected != null
                       ? () {
                     onSelected!(index);

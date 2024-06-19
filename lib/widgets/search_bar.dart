@@ -5,10 +5,7 @@ import '../models/models.dart';
 class SearchBar extends StatelessWidget {
   const SearchBar({
     super.key,
-    required this.currentUser,
   });
-
-  final User currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +28,10 @@ class SearchBar extends StatelessWidget {
                 decoration: InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
-                  hintText: 'Search replies',
+                  hintText: 'Search goals',
                   hintStyle: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-            ),
-            CircleAvatar(
-              backgroundImage: AssetImage(currentUser.avatarUrl),
             ),
           ],
         ),

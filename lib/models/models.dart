@@ -46,3 +46,44 @@ class User {
   final String avatarUrl;
   final DateTime lastActive;
 }
+
+class Goal {
+  Goal({
+    required this.name,
+    required this.goalType,
+    this.tasks = const [],
+  });
+
+  final String name;
+  final GoalType goalType;
+  final List<Task> tasks;
+}
+
+enum GoalType {
+  learning,
+  building,
+  todo,
+}
+
+class Task {
+  Task({
+    required this.name,
+    required this.tool,
+    required this.estimation,
+  });
+
+  final String name;
+  final Set<Tool> tool;
+  final Duration estimation;
+}
+
+abstract class Tool {
+  String get name;
+}
+
+class StopwatchTool implements Tool {
+  late Stopwatch running = Stopwatch();
+
+  @override
+  String get name => 'Stopwatch';
+}

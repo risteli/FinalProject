@@ -7,8 +7,8 @@ import 'transitions/list_detail_transition.dart';          // Add import
 import 'widgets/animated_floating_action_button.dart';
 import 'widgets/disappearing_bottom_navigation_bar.dart';
 import 'widgets/disappearing_navigation_rail.dart';
-import 'widgets/email_list_view.dart';
-import 'widgets/reply_list_view.dart';                     // Add import
+import 'widgets/goal_list_view.dart';
+import 'widgets/task_list_view.dart';                     // Add import
 
 void main() {
   runApp(const MainApp());
@@ -108,7 +108,7 @@ class _FeedState extends State<Feed> with SingleTickerProviderStateMixin {
                   // Update from here ...
                   child: ListDetailTransition(
                     animation: _railAnimation,
-                    one: EmailListView(
+                    one: GoalListView(
                       selectedIndex: selectedIndex,
                       onSelected: (index) {
                         setState(() {
@@ -117,7 +117,7 @@ class _FeedState extends State<Feed> with SingleTickerProviderStateMixin {
                       },
                       currentUser: widget.currentUser,
                     ),
-                    two: const ReplyListView(),
+                    two: const TaskListView(),
                   ),
                   // ... to here.
                 ),

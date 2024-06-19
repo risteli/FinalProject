@@ -2,16 +2,10 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import 'check_button.dart';
 
-enum EmailType {
-  preview,
-  threaded,
-  primaryThreaded,
-}
-
-class EmailWidget extends StatefulWidget {
-  const EmailWidget({
+class GoalWidget extends StatefulWidget {
+  const GoalWidget({
     super.key,
-    required this.email,
+    required this.goal,
     this.isSelected = false,
     this.isPreview = true,
     this.isThreaded = false,
@@ -24,13 +18,13 @@ class EmailWidget extends StatefulWidget {
   final bool showHeadline;
   final bool isThreaded;
   final void Function()? onSelected;
-  final Email email;
+  final Goal goal;
 
   @override
-  State<EmailWidget> createState() => _EmailWidgetState();
+  State<GoalWidget> createState() => _GoalWidgetState();
 }
 
-class _EmailWidgetState extends State<EmailWidget> {
+class _GoalWidgetState extends State<GoalWidget> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late Color unselectedColor = Color.alphaBlend(
     _colorScheme.primary.withOpacity(0.08),
@@ -38,10 +32,10 @@ class _EmailWidgetState extends State<EmailWidget> {
   );
 
   Color get _surfaceColor => switch (widget) {
-    EmailWidget(isPreview: false) => _colorScheme.surface,
-    EmailWidget(isSelected: true) => _colorScheme.primaryContainer,
-    _ => unselectedColor,
-  };
+        GoalWidget(isPreview: false) => _colorScheme.surface,
+        GoalWidget(isSelected: true) => _colorScheme.primaryContainer,
+        _ => unselectedColor,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +50,13 @@ class _EmailWidgetState extends State<EmailWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget.showHeadline) ...[
-              EmailHeadline(
-                email: widget.email,
+              GoalHeadline(
+                goal: widget.goal,
                 isSelected: widget.isSelected,
               ),
             ],
-            EmailContent(
-              email: widget.email,
+            GoalContent(
+              goal: widget.goal,
               isPreview: widget.isPreview,
               isThreaded: widget.isThreaded,
               isSelected: widget.isSelected,
@@ -74,35 +68,36 @@ class _EmailWidgetState extends State<EmailWidget> {
   }
 }
 
-class EmailContent extends StatefulWidget {
-  const EmailContent({
+class GoalContent extends StatefulWidget {
+  const GoalContent({
     super.key,
-    required this.email,
+    required this.goal,
     required this.isPreview,
     required this.isThreaded,
     required this.isSelected,
   });
 
-  final Email email;
+  final Goal goal;
   final bool isPreview;
   final bool isThreaded;
   final bool isSelected;
 
   @override
-  State<EmailContent> createState() => _EmailContentState();
+  State<GoalContent> createState() => _GoalContentState();
 }
 
-class _EmailContentState extends State<EmailContent> {
+class _GoalContentState extends State<GoalContent> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late final TextTheme _textTheme = Theme.of(context).textTheme;
 
   Widget get contentSpacer => SizedBox(height: widget.isThreaded ? 20 : 2);
 
-  String get lastActiveLabel {
+  String get activeTasksCounterLabel {
+    return 'Active tasks: ${widget.goal.tasks.length}';
     final DateTime now = DateTime.now();
-    if (widget.email.sender.lastActive.isAfter(now)) throw ArgumentError();
-    final Duration elapsedTime =
-    widget.email.sender.lastActive.difference(now).abs();
+//    if (widget.email.sender.lastActive.isAfter(now)) throw ArgumentError();
+    final Duration elapsedTime = Duration();
+    //widget.email.sender.lastActive.difference(now).abs();
     return switch (elapsedTime) {
       Duration(inSeconds: < 60) => '${elapsedTime.inSeconds}s',
       Duration(inMinutes: < 60) => '${elapsedTime.inMinutes}m',
@@ -113,12 +108,12 @@ class _EmailContentState extends State<EmailContent> {
   }
 
   TextStyle? get contentTextStyle => switch (widget) {
-    EmailContent(isThreaded: true) => _textTheme.bodyLarge,
-    EmailContent(isSelected: true) => _textTheme.bodyMedium
-        ?.copyWith(color: _colorScheme.onPrimaryContainer),
-    _ =>
-        _textTheme.bodyMedium?.copyWith(color: _colorScheme.onSurfaceVariant),
-  };
+        GoalContent(isThreaded: true) => _textTheme.bodyLarge,
+        GoalContent(isSelected: true) => _textTheme.bodyMedium
+            ?.copyWith(color: _colorScheme.onPrimaryContainer),
+        _ =>
+          _textTheme.bodyMedium?.copyWith(color: _colorScheme.onSurfaceVariant),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +127,6 @@ class _EmailContentState extends State<EmailContent> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (constraints.maxWidth - 200 > 0) ...[
-                  CircleAvatar(
-                    backgroundImage: AssetImage(widget.email.sender.avatarUrl),
-                  ),
                   const Padding(padding: EdgeInsets.symmetric(horizontal: 6.0)),
                 ],
                 Expanded(
@@ -142,31 +134,28 @@ class _EmailContentState extends State<EmailContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.email.sender.name.fullName,
+                        widget.goal.name,
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         style: widget.isSelected
                             ? _textTheme.labelMedium?.copyWith(
-                            color: _colorScheme.onSecondaryContainer)
+                                color: _colorScheme.onSecondaryContainer)
                             : _textTheme.labelMedium
-                            ?.copyWith(color: _colorScheme.onSurface),
+                                ?.copyWith(color: _colorScheme.onSurface),
                       ),
                       Text(
-                        lastActiveLabel,
+                        activeTasksCounterLabel,
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         style: widget.isSelected
                             ? _textTheme.labelMedium?.copyWith(
-                            color: _colorScheme.onSecondaryContainer)
+                                color: _colorScheme.onSecondaryContainer)
                             : _textTheme.labelMedium?.copyWith(
-                            color: _colorScheme.onSurfaceVariant),
+                                color: _colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
                 ),
-                if (constraints.maxWidth - 200 > 0) ...[
-                  const CheckButton(),
-                ]
               ],
             );
           }),
@@ -174,6 +163,7 @@ class _EmailContentState extends State<EmailContent> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /*
               if (widget.isPreview) ...[
                 Text(
                   widget.email.subject,
@@ -195,10 +185,11 @@ class _EmailContentState extends State<EmailContent> {
                 overflow: TextOverflow.ellipsis,
                 style: contentTextStyle,
               ),
+              */
             ],
           ),
-          const SizedBox(width: 12),
-          widget.email.attachments.isNotEmpty
+          /*const SizedBox(width: 12),
+          false//widget.email.attachments.isNotEmpty
               ? Container(
             height: 96,
             decoration: BoxDecoration(
@@ -209,9 +200,9 @@ class _EmailContentState extends State<EmailContent> {
               ),
             ),
           )
-              : const SizedBox.shrink(),
+              : const SizedBox.shrink(),*/
           if (!widget.isPreview) ...[
-            const EmailReplyOptions(),
+            const GoalReplyOptions(),
           ],
         ],
       ),
@@ -219,21 +210,21 @@ class _EmailContentState extends State<EmailContent> {
   }
 }
 
-class EmailHeadline extends StatefulWidget {
-  const EmailHeadline({
+class GoalHeadline extends StatefulWidget {
+  const GoalHeadline({
     super.key,
-    required this.email,
+    required this.goal,
     required this.isSelected,
   });
 
-  final Email email;
+  final Goal goal;
   final bool isSelected;
 
   @override
-  State<EmailHeadline> createState() => _EmailHeadlineState();
+  State<GoalHeadline> createState() => _GoalHeadlineState();
 }
 
-class _EmailHeadlineState extends State<EmailHeadline> {
+class _GoalHeadlineState extends State<GoalHeadline> {
   late final TextTheme _textTheme = Theme.of(context).textTheme;
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
@@ -258,18 +249,11 @@ class _EmailHeadlineState extends State<EmailHeadline> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.email.subject,
+                      'GoalHeadline' + widget.goal.name,
                       maxLines: 1,
                       overflow: TextOverflow.fade,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.w400),
-                    ),
-                    Text(
-                      '${widget.email.replies.toString()} Messages',
-                      maxLines: 1,
-                      overflow: TextOverflow.fade,
-                      style: _textTheme.labelMedium
-                          ?.copyWith(fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -307,14 +291,14 @@ class _EmailHeadlineState extends State<EmailHeadline> {
   }
 }
 
-class EmailReplyOptions extends StatefulWidget {
-  const EmailReplyOptions({super.key});
+class GoalReplyOptions extends StatefulWidget {
+  const GoalReplyOptions({super.key});
 
   @override
-  State<EmailReplyOptions> createState() => _EmailReplyOptionsState();
+  State<GoalReplyOptions> createState() => _GoalReplyOptionsState();
 }
 
-class _EmailReplyOptionsState extends State<EmailReplyOptions> {
+class _GoalReplyOptionsState extends State<GoalReplyOptions> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
   @override
@@ -330,7 +314,7 @@ class _EmailReplyOptionsState extends State<EmailReplyOptions> {
               child: TextButton(
                 style: ButtonStyle(
                   backgroundColor:
-                  MaterialStateProperty.all(_colorScheme.onInverseSurface),
+                      MaterialStateProperty.all(_colorScheme.onInverseSurface),
                 ),
                 onPressed: () {},
                 child: Text(
@@ -344,7 +328,7 @@ class _EmailReplyOptionsState extends State<EmailReplyOptions> {
               child: TextButton(
                 style: ButtonStyle(
                   backgroundColor:
-                  MaterialStateProperty.all(_colorScheme.onInverseSurface),
+                      MaterialStateProperty.all(_colorScheme.onInverseSurface),
                 ),
                 onPressed: () {},
                 child: Text(

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class StarButton extends StatefulWidget {
-  const StarButton({super.key});
+class CheckButton extends StatefulWidget {
+  const CheckButton({super.key});
 
   @override
-  State<StarButton> createState() => _StarButtonState();
+  State<CheckButton> createState() => _CheckButtonState();
 }
 
-class _StarButtonState extends State<StarButton> {
+class _CheckButtonState extends State<CheckButton> {
   bool state = false;
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
   Icon get icon {
-    final IconData iconData = state ? Icons.star : Icons.star_outline;
+    final IconData iconData = state ? Icons.check_circle : Icons.check_circle_outline;
 
     return Icon(
       iconData,
