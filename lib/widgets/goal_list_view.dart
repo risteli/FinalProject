@@ -10,12 +10,10 @@ class GoalListView extends StatelessWidget {
     super.key,
     this.selectedIndex,
     this.onSelected,
-    required this.currentUser,
   });
 
   final int? selectedIndex;
   final ValueChanged<int>? onSelected;
-  final User currentUser;
 
   @override
   Widget build(BuildContext context) {

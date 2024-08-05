@@ -1,7 +1,7 @@
 import 'models.dart';
 
 final goals = [
-  Goal(name: 'Learn BWV772', goalType: GoalType.learning, tasks: [
+  Goal(name: 'Learn BWV772 ?', goalType: GoalType.learning, tasks: [
     Task(
         name: 'LH Reading',
         tool: {},
