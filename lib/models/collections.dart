@@ -1,0 +1,41 @@
+import 'dart:collection';
+
+import 'package:flutter/material.dart';
+import 'models.dart';
+
+import 'dart:developer';
+
+class GoalsModel extends ChangeNotifier {
+  final List<Goal> _items = [];
+  int? _selected;
+
+  GoalsModel.from(List<Goal> items) {
+    _items.addAll(items);
+  }
+
+  UnmodifiableListView<Goal> get items => UnmodifiableListView(_items);
+
+  int? get selected => _selected;
+
+  set select(int index) {
+    _selected = index;
+    notifyListeners();
+  }
+
+  void add(Goal value) {
+    _items.add(value);
+    _selected ??= 0;
+    notifyListeners();
+  }
+
+  void update(int index, Goal value) {
+    _items[index] = value;
+    notifyListeners();
+  }
+
+  void clear() {
+    _items.clear();
+    _selected = null;
+    notifyListeners();
+  }
+}
