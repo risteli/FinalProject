@@ -9,6 +9,8 @@ class GoalsModel extends ChangeNotifier {
   final List<Goal> _items = [];
   int? _selected;
 
+  GoalsModel();
+
   GoalsModel.from(List<Goal> items) {
     _items.addAll(items);
   }
@@ -16,6 +18,12 @@ class GoalsModel extends ChangeNotifier {
   UnmodifiableListView<Goal> get items => UnmodifiableListView(_items);
 
   int? get selected => _selected;
+
+  void replace(GoalsModel rest) {
+    _items.clear();
+    _items.addAll(rest.items);
+    notifyListeners();
+  }
 
   set select(int index) {
     _selected = index;
