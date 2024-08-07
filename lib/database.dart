@@ -2,23 +2,115 @@ import 'dart:developer';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
+
+import 'models/collections.dart';
+import 'models/models.dart';
+
+var goalsFixture = GoalsModel.from(
+  [
+    Goal(name: 'Learn BWV772 ?', goalType: GoalType.learning, tasks: [
+      Task(name: 'LH Reading', estimation: Duration(minutes: 10)),
+      Task(name: 'RH Reading', estimation: Duration(minutes: 10)),
+      Task(
+          name: 'Practice C Scale',
+          estimation: Duration(minutes: 10)),
+      Task(
+          name: 'Practice D Scale',
+          estimation: Duration(minutes: 10)),
+      Task(
+          name: 'Practice A minor Scale',
+          estimation: Duration(minutes: 10)),
+      Task(
+          name: 'Measures 1-4',
+          estimation: Duration(minutes: 10)),
+      Task(
+          name: 'Measures 2-8',
+          estimation: Duration(minutes: 10)),
+    ]),
+    Goal(
+        name: 'Read Good Strategy Bad Strategy',
+        goalType: GoalType.learning,
+        tasks: [
+          Task(name: 'Chapter 1', estimation: Duration(minutes: 15)),
+          Task(name: 'Chapter 2', estimation: Duration(minutes: 15)),
+        ]),
+    Goal(name: 'Bake a traditional pie', goalType: GoalType.learning, tasks: [
+      Task(
+          name: 'Buy ingredients', estimation: Duration(minutes: 60)),
+      Task(
+          name: 'Mix all together',
+          estimation: Duration(minutes: 15)),
+      Task(name: 'Bake', estimation: Duration(minutes: 30)),
+    ]),
+  ],
+);
 
 class AppDatabaseMigrations {
-  void v1up(Database db) {
+  static const goalsTable = 'goals';
+  static const tasksTable = 'tasks';
+
+  void v1up(Database db) async {
     var batch = db.batch();
 
     batch.execute(
       '''
-      CREATE TABLE goals(
+      CREATE TABLE $goalsTable(
         id INTEGER PRIMARY KEY, 
-        name TEXT, 
-        age INTEGER
+        name TEXT,
+        type TEXT
        )
       ''',
     );
 
-    batch.commit();
+    batch.execute(
+      '''
+      CREATE TABLE $tasksTable(
+        id INTEGER PRIMARY KEY,         
+        name TEXT,
+        estimation INTEGER,
+        goal_id REFERENCES goals ON DELETE cascade
+       )
+      ''',
+    );
+
+    await batch.commit(noResult: true);
+  }
+
+  void addFixture(Database db) async {
+    await db.delete(goalsTable);
+
+
+    var batch = db.batch();
+    for (var i = 0; i < goalsFixture.items.length; i++) {
+      var goal = goalsFixture.items[i];
+      batch.insert(goalsTable, goal.toMap());
+    }
+    var ids = await batch.commit();
+
+    for (var i = 0; i < goalsFixture.items.length; i++) {
+      goalsFixture.items[i].id = ids[i] as int;
+    }
+
+
+    for (var i = 0; i < goalsFixture.items.length; i++) {
+      var goal = goalsFixture.items[i];
+
+      batch = db.batch();
+      for (var j=0;j<goal.tasks.length; j++) {
+        goal.tasks[j].goalId = goal.id;
+        batch.insert(tasksTable, goal.tasks[j].toMap());
+      }
+      ids = await batch.commit();
+
+      for (var j=0;j<goal.tasks.length; j++) {
+        goal.tasks[j].id = ids[j] as int;
+      }
+    }
+
+
+    goalsFixture.items.forEach((goal) {
+      log('now $goal');
+    });
   }
 }
 
@@ -41,7 +133,9 @@ class AppDatabase {
       version: 1,
     );
 
-    await database.getVersion().then((version) => log('db ready version=${version}'));
+    await database
+        .getVersion()
+        .then((version) => log('db ready version=${version}'));
 
     return database;
   }
@@ -52,10 +146,14 @@ class AppDatabase {
     return _instance!;
   }
 
-  static void _migrate(db, version) {
+  Database get database =>  _database;
+
+  static void _migrate(db, version) async {
     var _migrations = AppDatabaseMigrations();
 
     log('migrate to $version');
     _migrations.v1up(db);
+
+    _migrations.addFixture(db);
   }
 }

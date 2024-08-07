@@ -1,63 +1,41 @@
+import 'dart:developer';
+
+import 'package:final_project/database.dart';
+import 'package:sqflite/sqflite.dart';
+
 import '../models/collections.dart';
 import '../models/models.dart';
 
-var fixture = GoalsModel.from(
-  [
-    Goal(name: 'Learn BWV772 ?', goalType: GoalType.learning, tasks: [
-      Task(name: 'LH Reading', tool: {}, estimation: Duration(minutes: 10)),
-      Task(name: 'RH Reading', tool: {}, estimation: Duration(minutes: 10)),
-      Task(
-          name: 'Practice C Scale',
-          tool: <Tool>{StopwatchTool()},
-          estimation: Duration(minutes: 10)),
-      Task(
-          name: 'Practice D Scale',
-          tool: <Tool>{StopwatchTool()},
-          estimation: Duration(minutes: 10)),
-      Task(
-          name: 'Practice A minor Scale',
-          tool: <Tool>{StopwatchTool()},
-          estimation: Duration(minutes: 10)),
-      Task(
-          name: 'Measures 1-4',
-          tool: <Tool>{StopwatchTool()},
-          estimation: Duration(minutes: 10)),
-      Task(
-          name: 'Measures 2-8',
-          tool: <Tool>{StopwatchTool()},
-          estimation: Duration(minutes: 10)),
-    ]),
-    Goal(
-        name: 'Read Good Strategy Bad Strategy',
-        goalType: GoalType.learning,
-        tasks: [
-          Task(name: 'Chapter 1', tool: {}, estimation: Duration(minutes: 15)),
-          Task(name: 'Chapter 2', tool: {}, estimation: Duration(minutes: 15)),
-        ]),
-    Goal(name: 'Bake a traditional pie', goalType: GoalType.learning, tasks: [
-      Task(
-          name: 'Buy ingredients', tool: {}, estimation: Duration(minutes: 60)),
-      Task(
-          name: 'Mix all together',
-          tool: {},
-          estimation: Duration(minutes: 15)),
-      Task(name: 'Bake', tool: {}, estimation: Duration(minutes: 30)),
-    ]),
-  ],
-);
 
 class GoalsRepo {
-  GoalsRepo._privateConstructor();
+  GoalsRepo._privateConstructor(this.db);
+  Database db;
 
-  static final GoalsRepo _instance = GoalsRepo._privateConstructor();
+  static GoalsRepo? _instance;
 
-  factory GoalsRepo() {
-    return _instance;
+  factory GoalsRepo(AppDatabase appdb) {
+    _instance ??= GoalsRepo._privateConstructor(appdb.database);
+    return _instance!;
   }
 
   Future<GoalsModel> readAll() async {
-    return await Future.delayed(const Duration(seconds: 10), () {
-      return fixture;
-    });
+    var rawGoals = await db.query('goals');
+    var goals = GoalsModel();
+
+    Map<int,Goal> goalById = {};
+
+    for (var rawGoal in rawGoals) {
+      var goal = Goal.fromMap(rawGoal);
+      goals.add(goal);
+      goalById[goal.id!] = goal;
+    }
+
+    var rawTasks = await db.query('tasks');
+    for (var rawTask in rawTasks) {
+      var task = Task.fromMap(rawTask);
+      goalById[task.goalId!]!.tasks.add(task);
+    }
+
+    return goals;
   }
 }

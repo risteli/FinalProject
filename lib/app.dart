@@ -50,10 +50,12 @@ class _AppState extends State<App> {
           ),
         ],
       ),
-      floatingActionButton: AppFloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: doubleRail
+          ? null
+          : AppFloatingActionButton(
+              onPressed: () {},
+              child: const Icon(Icons.add),
+            ),
       bottomNavigationBar: doubleRail
           ? null
           : AppBottomNavigationBar(

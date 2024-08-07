@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:final_project/database.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'app.dart';
@@ -13,7 +14,10 @@ void main() async {
   AppDatabase.instance.then((db) {
     log('starting MainApp');
 
-    runApp(MainApp(db: db));
+    runApp(Provider<AppDatabase>(
+      create: (_) => db,
+      child: MainApp(db: db),
+    ));
   });
 }
 

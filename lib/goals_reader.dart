@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:final_project/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,7 @@ class GoalsReader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GoalsModel>(
-        future: GoalsRepo().readAll(),
+        future: GoalsRepo(Provider.of<AppDatabase>(context)).readAll(),
         builder: (BuildContext context, AsyncSnapshot<GoalsModel> snapshot) {
           if (snapshot.hasError) {
             return Center(

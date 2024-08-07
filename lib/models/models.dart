@@ -1,51 +1,4 @@
-class Attachment {
-  const Attachment({
-    required this.url,
-  });
-
-  final String url;
-}
-
-class Email {
-  const Email({
-    required this.sender,
-    required this.recipients,
-    required this.subject,
-    required this.content,
-    this.replies = 0,
-    this.attachments = const [],
-  });
-
-  final User sender;
-  final List<User> recipients;
-  final String subject;
-  final String content;
-  final List<Attachment> attachments;
-  final double replies;
-}
-
-class Name {
-  const Name({
-    required this.first,
-    required this.last,
-  });
-
-  final String first;
-  final String last;
-  String get fullName => '$first $last';
-}
-
-class User {
-  const User({
-    required this.name,
-    required this.avatarUrl,
-    required this.lastActive,
-  });
-
-  final Name name;
-  final String avatarUrl;
-  final DateTime lastActive;
-}
+import 'dart:developer';
 
 class Goal {
   Goal({
@@ -54,9 +7,30 @@ class Goal {
     this.tasks = const [],
   });
 
-  final String name;
-  final GoalType goalType;
-  final List<Task> tasks;
+  int? id;
+  late final String name;
+  late final GoalType goalType;
+  List<Task> tasks = [];
+
+  Map<String, Object?> toMap() {
+    return {
+      'name': name,
+      'type': goalType.name,
+    };
+  }
+
+  Goal.fromMap(Map<String, Object?> map) {
+    id = map['id'] as int?;
+    name = map['name'] as String;
+    goalType = GoalType.values.byName(map['type'] as String);
+  }
+
+  @override
+  String toString() {
+    String tasksList = tasks.join(',');
+
+    return "Goal(id=$id, $name, ${goalType.name}, $tasksList)";
+  }
 }
 
 enum GoalType {
@@ -66,15 +40,38 @@ enum GoalType {
 }
 
 class Task {
-  Task({
-    required this.name,
-    required this.tool,
-    required this.estimation,
-  });
+  Task({this.name = "", this.estimation});
 
-  final String name;
-  final Set<Tool> tool;
-  final Duration estimation;
+  late final String name;
+
+  int? id;
+  int? goalId;
+  Set<Tool> tool = {};
+  Duration? estimation;
+
+  Map<String, Object?> toMap() {
+    return {
+      'goal_id': goalId,
+      'name': name,
+      'estimation': estimation?.inSeconds,
+    };
+  }
+
+  Task.fromMap(Map<String, Object?> map) {
+    id = map['id'] as int?;
+    goalId = map['goal_id'] as int?;
+    name = map['name'] as String;
+    var est = map['estimation'] as int?;
+
+    if (est != null) {
+      estimation = Duration(seconds: est!);
+    }
+  }
+
+  @override
+  String toString() {
+    return "Task(id=$id, goal_id=${goalId}, $name)";
+  }
 }
 
 abstract class Tool {
