@@ -1,23 +1,30 @@
 import 'dart:developer';
 
+import 'package:final_project/database.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'app.dart';
 
 void main() async {
-  runApp(const MainApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  AppDatabase.instance.then((db) {
+    log('starting MainApp');
+
+    runApp(MainApp(db: db));
+  });
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({
     super.key,
+    required this.db,
   });
 
-  @override
-  State<MainApp> createState() => _MainAppState();
-}
+  final AppDatabase db;
 
-class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
