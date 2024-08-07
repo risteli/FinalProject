@@ -14,7 +14,6 @@ class AppBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Modify from here...
     return NavigationBar(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -27,6 +26,7 @@ class AppBottomNavigationBar extends StatelessWidget {
       selectedIndex: selectedIndex,
       onDestinationSelected: onDestinationSelected,
     );
-    // ... to here.
   }
 }
+
+

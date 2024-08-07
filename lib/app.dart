@@ -2,9 +2,7 @@ import 'dart:developer';
 
 import 'package:final_project/goals.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import 'models/collections.dart';
 import 'widgets/app_floating_action_button.dart';
 import 'widgets/app_bottom_navigation_bar.dart';
 import 'widgets/app_navigation_rail.dart';
@@ -22,8 +20,6 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _backgroundColor = Color.alphaBlend(
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
-
-  bool controllerInitialized = false;
 
   @override
   Widget build(BuildContext context) {
