@@ -44,7 +44,7 @@ class _AppState extends State<App> {
               // this should be replaced by navigation!
               color: _backgroundColor,
               child: GoalsReader(
-                child: GoalsEditor(),
+                child: GoalsBrowser(),
               ),
             ),
           ),
