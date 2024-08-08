@@ -134,7 +134,7 @@ class _GoalContentState extends State<GoalContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.goal.name,
+                        widget.goal.name ?? "",
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         style: widget.isSelected
@@ -249,7 +249,7 @@ class _GoalHeadlineState extends State<GoalHeadline> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'GoalHeadline' + widget.goal.name,
+                      'GoalHeadline' + (widget.goal.name ?? ""),
                       maxLines: 1,
                       overflow: TextOverflow.fade,
                       style: const TextStyle(

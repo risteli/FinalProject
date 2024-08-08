@@ -8,14 +8,15 @@ class Goal {
   });
 
   int? id;
-  late final String name;
-  late final GoalType goalType;
+  late String name;
+  GoalType? goalType;
+  Set<Tool> tool = {};
   List<Task> tasks = [];
 
   Map<String, Object?> toMap() {
     return {
       'name': name,
-      'type': goalType.name,
+      'type': goalType?.name,
     };
   }
 
@@ -29,7 +30,7 @@ class Goal {
   String toString() {
     String tasksList = tasks.join(',');
 
-    return "Goal(id=$id, $name, ${goalType.name}, $tasksList)";
+    return "Goal(id=$id, $name, ${goalType?.name}, $tasksList)";
   }
 }
 
@@ -40,13 +41,12 @@ enum GoalType {
 }
 
 class Task {
-  Task({this.name = "", this.estimation});
+  Task({required this.name, this.estimation});
 
-  late final String name;
+  late String name;
 
   int? id;
   int? goalId;
-  Set<Tool> tool = {};
   Duration? estimation;
 
   Map<String, Object?> toMap() {

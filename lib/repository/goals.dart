@@ -38,4 +38,10 @@ class GoalsRepo {
 
     return goals;
   }
+
+  Future update(Goal goal) async {
+    log('now updating $goal');
+    
+    await db.update(AppDatabase.goalsTable, goal.toMap(), where: 'id=?', whereArgs: [goal.id]);
+  }
 }

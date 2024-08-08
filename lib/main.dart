@@ -16,7 +16,7 @@ void main() async {
 
     runApp(Provider<AppDatabase>(
       create: (_) => db,
-      child: MainApp(db: db),
+      child: MainApp(),
     ));
   });
 }
@@ -24,10 +24,7 @@ void main() async {
 class MainApp extends StatelessWidget {
   const MainApp({
     super.key,
-    required this.db,
   });
-
-  final AppDatabase db;
 
   @override
   Widget build(BuildContext context) {
