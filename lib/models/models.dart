@@ -10,13 +10,15 @@ class Goal {
   int? id;
   late String name;
   GoalType? goalType;
-  Set<Tool> tool = {};
+  Set<ToolType> tool = {};
   List<Task> tasks = [];
 
   Map<String, Object?> toMap() {
+    log(ToolType.values.byName("notes").name);
     return {
       'name': name,
       'type': goalType?.name,
+      'tool': tool.map((v) => v.name).join(','),
     };
   }
 
@@ -24,6 +26,27 @@ class Goal {
     id = map['id'] as int?;
     name = map['name'] as String;
     goalType = GoalType.values.byName(map['type'] as String);
+
+    var toolString = map['tool'] as String?;
+
+    tool = {};
+    if (toolString != null) {
+      for (var toolName in toolString.split(',')) {
+        if (toolName == '') {
+          continue;
+        }
+
+        var toolRead;
+        try {
+          toolRead = ToolType.values.byName(toolName);
+        } on ArgumentError {
+          log('invalid tool value "$toolName" from ${ToolType.values}');
+          continue;
+        }
+
+        tool.add(toolRead);
+      }
+    }
   }
 
   @override
@@ -35,9 +58,13 @@ class Goal {
 }
 
 enum GoalType {
-  learning,
-  building,
-  todo,
+  learning(description: "I want to learn something"),
+  building(description: "I want to build something"),
+  todo(description: "I need to complete tasks");
+
+  const GoalType({required this.description});
+
+  final String description;
 }
 
 class Task {
@@ -74,13 +101,23 @@ class Task {
   }
 }
 
+enum ToolType {
+  stopwatch(description: "Stopwatch"),
+  metronome(description: "Metronome"),
+  notes(description: "Notes");
+
+  const ToolType({required this.description});
+
+  final String description;
+}
+
 abstract class Tool {
-  String get name;
+  ToolType get toolType;
 }
 
 class StopwatchTool implements Tool {
   late Stopwatch running = Stopwatch();
 
   @override
-  String get name => 'Stopwatch';
+  ToolType get toolType => ToolType.stopwatch;
 }

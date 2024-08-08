@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'models/collections.dart';
+import 'models/models.dart';
 
 class GoalEditor extends StatefulWidget {
   const GoalEditor({
@@ -31,8 +32,10 @@ class _GoalEditorState extends State<GoalEditor> {
     final goalsModel = Provider.of<GoalsModel>(context);
     final goal = goalsModel.items[goalsModel.selected!];
 
-    void updateGoal() => goalsRepo.update(goal).then((_) => log('goal update completed'));
-
+    void updateGoal() => setState(() {
+          goalsRepo.update(goal).then((_) => log('goal update completed'));
+          return;
+        });
     nameController.text = goal.name ?? "";
 
     return Padding(
@@ -52,12 +55,44 @@ class _GoalEditorState extends State<GoalEditor> {
                     Text("What do you want to accomplish?",
                         style: TextStyle(fontSize: 12)),
                     TextField(
-                        controller: nameController,
+                      controller: nameController,
                       onSubmitted: (value) {
-                          goal.name = value;
-                          updateGoal();
+                        goal.name = value;
+                        updateGoal();
                       },
                     ),
+                    SizedBox(height: 16),
+                    Text("What best describes your goal?",
+                        style: TextStyle(fontSize: 12)),
+                    ...GoalType.values.map(
+                      (goalType) => RadioListTile(
+                        title: Text(goalType.description),
+                        value: goalType,
+                        groupValue: goal.goalType,
+                        onChanged: (GoalType? value) {
+                          log('update for $goalType: $value');
+                          goal.goalType = value;
+                          updateGoal();
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Text("Which tools could be useful to progress on your goal?",
+                        style: TextStyle(fontSize: 12)),
+                    ...ToolType.values.map(
+                          (toolType) => CheckboxListTile(
+                        title: Text(toolType.name),
+                        value: goal.tool.contains(toolType),
+                        onChanged: (bool? value) {
+                          if (value == null || value == false) {
+                            goal.tool.remove(toolType);
+                          } else {
+                            goal.tool.add(toolType);
+                          }
+                          updateGoal();
+                        },
+                      ),
+                    )
                   ],
                 ),
               ),

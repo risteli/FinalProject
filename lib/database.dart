@@ -41,7 +41,8 @@ class AppDatabaseMigrations {
       CREATE TABLE ${AppDatabase.goalsTable}(
         id INTEGER PRIMARY KEY, 
         name TEXT,
-        type TEXT
+        type TEXT,
+        tool TEXT
        )
       ''',
     );

@@ -40,7 +40,7 @@ class GoalsRepo {
   }
 
   Future update(Goal goal) async {
-    log('now updating $goal');
+    log('now updating $goal ${goal.toMap()}');
     
     await db.update(AppDatabase.goalsTable, goal.toMap(), where: 'id=?', whereArgs: [goal.id]);
   }
