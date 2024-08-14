@@ -51,7 +51,8 @@ class _GoalEditorState extends State<GoalEditor> {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.0),
           child: Consumer<GoalsModel>(
-            builder: (context, goals, _) => ListView(
+            builder: (context, goals, _) => Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text("Describe your goal.", style: TextStyle(fontSize: 24)),
                 SizedBox(height: 8),

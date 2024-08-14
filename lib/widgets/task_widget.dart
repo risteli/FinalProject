@@ -18,13 +18,9 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
-    return
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child:ReorderableListView(
-
+    return Expanded(
+      child: ReorderableListView(
         onReorder: (int oldIndex, int newIndex) {},
-        shrinkWrap: true,
         children: [
           for (var task in widget.tasks)
             ListTile(
@@ -32,7 +28,14 @@ class _TaskListState extends State<TaskList> {
               title: Text(task.name),
               trailing: Icon(Icons.repeat),
             ),
+          for (var task in widget.tasks)
+            ListTile(
+              key: Key('2${task.name}'),
+              title: Text(task.name),
+              trailing: Icon(Icons.repeat),
+            ),
         ],
-    ),);
+      ),
+    );
   }
 }
