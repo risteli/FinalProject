@@ -75,7 +75,7 @@ enum GoalType {
 }
 
 class Task {
-  Task({required this.name, this.estimation});
+  Task({required this.name, this.estimation, this.goalId, this.position = 0});
 
   late String name;
 

@@ -81,8 +81,14 @@ class GoalsRepo {
   }
 
   Future updateTask(Task task) async {
-    log('now inserting or updating $task ${task.toMap()}');
+    log('now updating $task ${task.toMap()}');
     await db.update(AppDatabase.tasksTable, task.toMap(),
         where: 'id=?', whereArgs: [task.id]);
+  }
+
+  Future createTask(Task task) async {
+    log('now creating $task ${task.toMap()}');
+    task.id = await db.insert(AppDatabase.tasksTable, task.toMap());
+    log('created $task');
   }
 }

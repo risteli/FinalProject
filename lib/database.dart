@@ -56,7 +56,7 @@ class AppDatabaseMigrations {
         estimation INTEGER,
         repeatable INTEGER NOT NULL DEFAULT 0,
         position INTEGER NOT NULL DEFAULT 0,
-        goal_id REFERENCES goals ON DELETE cascade
+        goal_id INTEGER NOT NULL REFERENCES goals ON DELETE cascade
        )
       ''',
     );
