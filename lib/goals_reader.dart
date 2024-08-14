@@ -7,10 +7,6 @@ import 'package:provider/provider.dart';
 import 'models/collections.dart';
 import 'repository/goals.dart';
 
-import 'widgets/app_list_detail.dart'; // Add import
-import 'widgets/goal_list_view.dart';
-import 'widgets/task_list_view.dart'; // Add import
-
 class GoalsReader extends StatelessWidget {
   const GoalsReader({
     super.key,

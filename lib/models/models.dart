@@ -1,5 +1,8 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
 class Goal {
   Goal({
     required this.name,
@@ -58,13 +61,15 @@ class Goal {
 }
 
 enum GoalType {
-  learning(description: "I want to learn something"),
-  building(description: "I want to build something"),
-  todo(description: "I need to complete tasks");
+  learning(description: "Learn", icon: Icons.school),
+  building(description: "Build", icon: Icons.construction),
+  todo(description: "To-do", icon: Icons.list);
 
-  const GoalType({required this.description});
+  const GoalType({required this.description, required this.icon});
 
+  final IconData icon;
   final String description;
+
 }
 
 class Task {
@@ -102,12 +107,12 @@ class Task {
 }
 
 enum ToolType {
-  stopwatch(description: "Stopwatch"),
-  metronome(description: "Metronome"),
-  notes(description: "Notes");
+  stopwatch(description: "Stopwatch", icon: Icons.timer),
+  notes(description: "Notes", icon: Icons.note);
 
-  const ToolType({required this.description});
+  const ToolType({required this.description, required this.icon});
 
+  final IconData icon;
   final String description;
 }
 
