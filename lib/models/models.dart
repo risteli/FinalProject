@@ -15,12 +15,14 @@ class Goal {
   GoalType? goalType;
   Set<ToolType> tool = {};
   List<Task> tasks = [];
+  int position = 0;
 
   Map<String, Object?> toMap() {
     log(ToolType.values.byName("notes").name);
     return {
       'name': name,
       'type': goalType?.name,
+      'position': position,
       'tool': tool.map((v) => v.name).join(','),
     };
   }
@@ -28,6 +30,7 @@ class Goal {
   Goal.fromMap(Map<String, Object?> map) {
     id = map['id'] as int?;
     name = map['name'] as String;
+    position = map['position'] as int;
     goalType = GoalType.values.byName(map['type'] as String);
 
     var toolString = map['tool'] as String?;
@@ -56,7 +59,7 @@ class Goal {
   String toString() {
     String tasksList = tasks.join(',');
 
-    return "Goal(id=$id, $name, ${goalType?.name}, $tasksList)";
+    return "Goal(id=$id, p=$position, $name, ${goalType?.name}, $tasksList)";
   }
 }
 
@@ -69,7 +72,6 @@ enum GoalType {
 
   final IconData icon;
   final String description;
-
 }
 
 class Task {
@@ -80,11 +82,15 @@ class Task {
   int? id;
   int? goalId;
   Duration? estimation;
+  int position = 0;
+  bool repeatable = false;
 
   Map<String, Object?> toMap() {
     return {
       'goal_id': goalId,
       'name': name,
+      'position': position,
+      'repeatable': repeatable ? 1 : 0,
       'estimation': estimation?.inSeconds,
     };
   }
@@ -93,6 +99,8 @@ class Task {
     id = map['id'] as int?;
     goalId = map['goal_id'] as int?;
     name = map['name'] as String;
+    position = map['position'] as int;
+    repeatable = (map['repeatable'] as int) == 1;
     var est = map['estimation'] as int?;
 
     if (est != null) {
@@ -102,7 +110,7 @@ class Task {
 
   @override
   String toString() {
-    return "Task(id=$id, goal_id=${goalId}, $name)";
+    return "Task(id=$id, p=$position, goal_id=${goalId}, $name)";
   }
 }
 

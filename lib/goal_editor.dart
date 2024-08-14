@@ -104,6 +104,7 @@ class _GoalEditorState extends State<GoalEditor> {
                   selected: goal.tool,
                   showSelectedIcon: false,
                   multiSelectionEnabled: true,
+                  emptySelectionAllowed: true,
                   onSelectionChanged: (Set<ToolType> values) {
                     log('update for tool type: ${values.first}');
                     goal.tool = values;
@@ -114,7 +115,7 @@ class _GoalEditorState extends State<GoalEditor> {
                 Text("List the tasks needed to accomplish your goal:",
                     style: TextStyle(fontSize: 12)),
                 SizedBox(height: 8),
-                TaskList(tasks: goal.tasks)
+                TaskList(goal: goal)
               ],
             ),
           ),

@@ -42,7 +42,8 @@ class AppDatabaseMigrations {
         id INTEGER PRIMARY KEY, 
         name TEXT,
         type TEXT,
-        tool TEXT
+        tool TEXT,
+        position INTEGER NOT NULL DEFAULT 0
        )
       ''',
     );
@@ -53,6 +54,8 @@ class AppDatabaseMigrations {
         id INTEGER PRIMARY KEY,         
         name TEXT,
         estimation INTEGER,
+        repeatable INTEGER NOT NULL DEFAULT 0,
+        position INTEGER NOT NULL DEFAULT 0,
         goal_id REFERENCES goals ON DELETE cascade
        )
       ''',
@@ -67,6 +70,7 @@ class AppDatabaseMigrations {
     var batch = db.batch();
     for (var i = 0; i < goalsFixture.items.length; i++) {
       var goal = goalsFixture.items[i];
+      goal.position = i;
       batch.insert(AppDatabase.goalsTable, goal.toMap());
     }
     var ids = await batch.commit();
@@ -81,6 +85,7 @@ class AppDatabaseMigrations {
       batch = db.batch();
       for (var j = 0; j < goal.tasks.length; j++) {
         goal.tasks[j].goalId = goal.id;
+        goal.tasks[j].position = j;
         batch.insert(AppDatabase.tasksTable, goal.tasks[j].toMap());
       }
       ids = await batch.commit();
