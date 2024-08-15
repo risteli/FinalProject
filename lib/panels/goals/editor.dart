@@ -1,12 +1,12 @@
 import 'dart:developer';
 
-import 'package:final_project/database.dart';
+import 'package:final_project/repository/database.dart';
 import 'package:final_project/repository/goals.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'models/collections.dart';
-import 'models/models.dart';
+import '../../models/roots.dart';
+import '../../models/models.dart';
 import 'task_editor.dart';
 
 class GoalEditor extends StatefulWidget {

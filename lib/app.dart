@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:final_project/goals.dart';
-import 'package:final_project/goals_reader.dart';
+import 'package:final_project/panels/goals/panel.dart';
+import 'package:final_project/panels/goals/loader.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/app_floating_action_button.dart';
@@ -43,8 +43,8 @@ class _AppState extends State<App> {
             child: Container(
               // this should be replaced by navigation!
               color: _backgroundColor,
-              child: GoalsReader(
-                child: GoalsBrowser(),
+              child: GoalsAsyncLoader(
+                child: GoalsPanel(),
               ),
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models/models.dart';
-import 'widgets/check_button.dart';
+import '../../models/models.dart';
+import '../../widgets/check_button.dart';
 
 class GoalTile extends StatefulWidget {
   const GoalTile({

@@ -2,12 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'goal_editor.dart';
-import 'widgets/app_list_detail.dart'; // Add import
-import 'goal_browser.dart';
+import 'editor.dart';
+import '../../widgets/app_list_detail.dart'; // Add import
+import 'browser.dart';
 
-class GoalsBrowser extends StatelessWidget {
-  const GoalsBrowser({
+class GoalsPanel extends StatelessWidget {
+  const GoalsPanel({
     super.key,
   });
 

@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:final_project/app.dart';
-import 'package:final_project/database.dart';
+import 'package:final_project/repository/database.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/collections.dart';
+import '../models/roots.dart';
 import '../models/models.dart';
 
 class GoalsRepo {

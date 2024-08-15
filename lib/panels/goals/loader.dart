@@ -1,14 +1,14 @@
 import 'dart:developer';
 
-import 'package:final_project/database.dart';
+import 'package:final_project/repository/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'models/collections.dart';
-import 'repository/goals.dart';
+import '../../models/roots.dart';
+import '../../repository/goals.dart';
 
-class GoalsReader extends StatelessWidget {
-  const GoalsReader({
+class GoalsAsyncLoader extends StatelessWidget {
+  const GoalsAsyncLoader({
     super.key,
     required this.child,
   });
@@ -23,6 +23,7 @@ class GoalsReader extends StatelessWidget {
           if (snapshot.hasError) {
             return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Icon(
                     Icons.error_outline,
@@ -38,27 +39,20 @@ class GoalsReader extends StatelessWidget {
             );
           }
 
-          if (snapshot.hasData) {
-            return ChangeNotifierProvider(
-              create: (_) => snapshot.data!,
-              child: child,
+          if (!snapshot.hasData) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                ],
+              ),
             );
           }
 
-          return const Center(
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.warning_outlined,
-                  color: Colors.orange,
-                  size: 60,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text('No data'),
-                ),
-              ],
-            ),
+          return ChangeNotifierProvider(
+            create: (_) => snapshot.data!,
+            child: child,
           );
         });
   }

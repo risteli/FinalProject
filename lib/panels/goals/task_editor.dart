@@ -1,11 +1,11 @@
 import 'dart:developer';
 
-import 'package:final_project/task_tile.dart';
+import 'task_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'database.dart';
-import 'models/models.dart';
-import 'repository/goals.dart';
+import '../../repository/database.dart';
+import '../../models/models.dart';
+import '../../repository/goals.dart';
 
 class TaskList extends StatefulWidget {
   const TaskList({

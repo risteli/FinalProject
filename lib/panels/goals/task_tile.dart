@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'database.dart';
-import 'models/models.dart';
-import 'repository/goals.dart';
+import '../../repository/database.dart';
+import '../../models/models.dart';
+import '../../repository/goals.dart';
 
 class TaskTile extends StatefulWidget {
   const TaskTile({

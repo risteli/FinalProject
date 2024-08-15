@@ -3,12 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'database.dart';
-import 'models/collections.dart';
+import '../../repository/database.dart';
+import '../../models/roots.dart';
 
-import 'repository/goals.dart';
+import '../../repository/goals.dart';
 import 'goal_tile.dart';
-import 'widgets/search_bar.dart' as search_bar;
+import '../../widgets/search_bar.dart' as search_bar;
 
 class GoalBrowserView extends StatefulWidget {
   const GoalBrowserView({

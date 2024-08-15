@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'models/collections.dart';
-import 'models/models.dart';
+import '../models/roots.dart';
+import '../models/models.dart';
 
 var goalsFixture = GoalsModel.from(
   [
