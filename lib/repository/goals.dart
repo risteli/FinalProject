@@ -47,6 +47,37 @@ class GoalsRepo {
         where: 'id=?', whereArgs: [goal.id]);
   }
 
+  Future updateGoals(GoalsModel goals) async {
+    log('now updating $goals');
+
+    var batch = db.batch();
+    for (var i = 0; i < goals.items.length; i++) {
+      var goal = goals.items[i];
+      goal.position = i;
+
+      var record = goal.toMap();
+      if (goal.id != null) {
+        record['id'] = goal.id;
+      }
+
+      log('now inserting or updating $goal ${goal.toMap()}');
+      batch.insert(AppDatabase.goalsTable, record,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    var ids = await batch.commit();
+
+    if (true) // TODO REMOVE THIS
+      for (var i = 0; i < goals.items.length; i++) {
+        log('id of $i is ${ids[i]} and was ${goals.items[i].id}');
+      }
+
+    var idsPlaceholders = List.filled(ids.length, '?').join(',');
+
+    await db.delete(AppDatabase.goalsTable,
+        where: 'id NOT IN (${idsPlaceholders})',
+        whereArgs: ids);
+  }
+
   Future updateTasks(Goal goal) async {
     log('now updating $goal ${goal.toMap()}');
 

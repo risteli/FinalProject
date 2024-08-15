@@ -2,78 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../database.dart';
-import '../models/models.dart';
-import '../repository/goals.dart';
+import 'database.dart';
+import 'models/models.dart';
+import 'repository/goals.dart';
 
-class TaskList extends StatefulWidget {
-  const TaskList({
-    super.key,
-    required this.goal,
-  });
-
-  final Goal goal;
-
-  @override
-  State<TaskList> createState() => _TaskListState();
-}
-
-class _TaskListState extends State<TaskList> {
-  final newTaskController = TextEditingController();
-
-  @override
-  void dispose() {
-    newTaskController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
-    final tasks = widget.goal.tasks;
-
-    return Expanded(
-      child: ReorderableListView(
-        onReorder: (int oldIndex, int newIndex) {
-          log('reorder $oldIndex to $newIndex');
-          setState(() => tasks.insert(newIndex, tasks.removeAt(oldIndex)));
-          goalsRepo.updateTasks(widget.goal);
-        },
-        children: [
-          for (var task in tasks)
-            TaskWidget(
-              key: Key('task-${task.id}'),
-              goal: widget.goal,
-              task: task,
-            ),
-          TextField(
-            key: Key('task-new'),
-            controller: newTaskController,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.add),
-              labelText: 'You can add a new task here',
-            ),
-            onSubmitted: (value) {
-              setState(() {
-                var task = Task(
-                  name: value,
-                  goalId: widget.goal.id,
-                  position: tasks.length,
-                );
-                tasks.add(task);
-                newTaskController.clear();
-                goalsRepo.createTask(task);
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class TaskWidget extends StatefulWidget {
-  const TaskWidget({
+class TaskTile extends StatefulWidget {
+  const TaskTile({
     super.key,
     required this.goal,
     required this.task,
@@ -83,10 +17,10 @@ class TaskWidget extends StatefulWidget {
   final Task task;
 
   @override
-  State<TaskWidget> createState() => _TaskWidgetState();
+  State<TaskTile> createState() => _TaskTileState();
 }
 
-class _TaskWidgetState extends State<TaskWidget> {
+class _TaskTileState extends State<TaskTile> {
   final taskController = TextEditingController();
   bool isEditing = false;
 

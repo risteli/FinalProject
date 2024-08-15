@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'goal_editor.dart';
 import 'widgets/app_list_detail.dart'; // Add import
-import 'widgets/goal_list_view.dart';
+import 'goal_browser.dart';
 
 class GoalsBrowser extends StatelessWidget {
   const GoalsBrowser({
@@ -14,7 +14,7 @@ class GoalsBrowser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppListDetail(
-      one: GoalListView(),
+      one: GoalBrowserView(),
       two: GoalEditor(),
     );
   }

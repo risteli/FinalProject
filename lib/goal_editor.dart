@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'models/collections.dart';
 import 'models/models.dart';
-import 'widgets/task_widget.dart';
+import 'task_editor.dart';
 
 class GoalEditor extends StatefulWidget {
   const GoalEditor({
