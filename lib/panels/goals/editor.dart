@@ -45,6 +45,8 @@ class _GoalEditorState extends State<GoalEditor> {
       goalTypeSet.add(goal.goalType!);
     }
 
+    // navigation wizard?
+
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 28.0),
       child: Card(

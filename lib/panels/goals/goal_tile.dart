@@ -32,9 +32,7 @@ class _GoalTileState extends State<GoalTile> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onSelected,
-      child: Card(
+    return Card(
         elevation: 0,
         color: _surfaceColor,
         clipBehavior: Clip.hardEdge,
@@ -44,11 +42,10 @@ class _GoalTileState extends State<GoalTile> {
           children: [
             GoalContent(
               goal: widget.goal,
-              isSelected: widget.isSelected,
+              onSelected: widget.onSelected,
             ),
           ],
         ),
-      ),
     );
   }
 }
@@ -57,10 +54,12 @@ class GoalContent extends StatefulWidget {
   const GoalContent({
     super.key,
     required this.goal,
-    required this.isSelected,
+    required this.onSelected,
+    this.isSelected = false,
   });
 
   final Goal goal;
+  final void Function()? onSelected;
   final bool isSelected;
 
   @override
@@ -125,6 +124,10 @@ class _GoalContentState extends State<GoalContent> {
                     ],
                   ),
                 ),
+                GestureDetector(
+                  child: Icon(Icons.chevron_right),
+                  onTap: widget.onSelected,
+                )
               ],
             );
           }),

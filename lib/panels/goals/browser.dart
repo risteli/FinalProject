@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:final_project/panels/goals/wizard.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +8,7 @@ import '../../repository/database.dart';
 import '../../models/roots.dart';
 
 import '../../repository/goals.dart';
+import '../../widgets/app_list_detail.dart';
 import 'goal_tile.dart';
 import '../../widgets/search_bar.dart' as search_bar;
 
@@ -54,6 +56,7 @@ class _GoalBrowserListState extends State<GoalBrowserList> {
   @override
   Widget build(BuildContext context) {
     final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
+    final appLayout = Provider.of<AppLayout>(context);
 
     return ReorderableListView(
       shrinkWrap: true,
@@ -70,7 +73,20 @@ class _GoalBrowserListState extends State<GoalBrowserList> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: GoalTile(
               goal: widget.goals.items[index],
-              onSelected: () => widget.goals.select = index,
+              onSelected: () {
+                widget.goals.select = index;
+                if (appLayout.singlePanel) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChangeNotifierProvider<GoalsModel>.value(
+                          value: widget.goals,
+                          child: GoalWizard(),
+                      ),
+                    ),
+                  );
+                }
+              },
               isSelected: widget.goals.selected == index,
             ),
           );
