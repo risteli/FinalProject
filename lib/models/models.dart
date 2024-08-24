@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 
 class Goal {
   Goal({
-    required this.name,
-    required this.goalType,
+    this.name='',
+    this.goalType,
     this.tasks = const [],
   });
 

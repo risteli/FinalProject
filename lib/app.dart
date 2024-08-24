@@ -25,7 +25,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000;
-    bool create = false;
+    final navigatorStateKey = GlobalKey<NavigatorState>();
 
     return Scaffold(
       body: Row(
@@ -39,14 +39,17 @@ class _AppState extends State<App> {
                   log('selecting navigation $index');
                 });
               },
-              onCreateButtonPressed: () => log('pressed create button on double page'),
+              onCreateButtonPressed: () =>
+                  navigatorStateKey.currentState!.pushNamed('/create-task'),
             ),
           Expanded(
             child: Container(
               // this should be replaced by navigation!
               color: _backgroundColor,
               child: GoalsAsyncLoader(
-                child: GoalsPanel(),
+                child: GoalsPanel(
+                  navigationStateKey: navigatorStateKey,
+                ),
               ),
             ),
           ),
@@ -55,7 +58,8 @@ class _AppState extends State<App> {
       floatingActionButton: doubleRail
           ? null
           : AppFloatingActionButton(
-              onPressed: () => log('pressed create button on single page'),
+              onPressed: () =>
+                  navigatorStateKey.currentState!.pushNamed('/create-task'),
               child: const Icon(Icons.add),
             ),
       bottomNavigationBar: doubleRail

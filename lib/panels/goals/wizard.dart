@@ -12,7 +12,10 @@ import 'task_editor.dart';
 class GoalWizard extends StatefulWidget {
   const GoalWizard({
     super.key,
+    this.create = false,
   });
+
+  final bool create;
 
   @override
   State<GoalWizard> createState() => _GoalWizardState();
@@ -29,7 +32,8 @@ class _GoalWizardState extends State<GoalWizard> {
   Widget build(BuildContext context) {
     final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
     final goalsModel = Provider.of<GoalsModel>(context);
-    final goal = goalsModel.items[goalsModel.selected!];
+    final goal =
+        widget.create ? Goal() : goalsModel.items[goalsModel.selected!];
 
     void updateGoal() => setState(() {
           goalsRepo.update(goal).then((_) => log('goal update completed'));
@@ -62,7 +66,7 @@ class _GoalWizardState extends State<GoalWizard> {
       backgroundColor: _backgroundColor,
       appBar: AppBar(
           backgroundColor: _backgroundColor,
-          title:const Text('Here you can define your goal')),
+          title: const Text('Here you can define your goal')),
       body: Card(
         color: _backgroundColor,
         child: Padding(

@@ -40,6 +40,14 @@ class GoalsRepo {
     return goals;
   }
 
+  Future create(Goal goal) async {
+    log('now creating $goal ${goal.toMap()}');
+
+    goal.id = await db.insert(AppDatabase.goalsTable, goal.toMap());
+
+    log('created $goal');
+  }
+
   Future update(Goal goal) async {
     log('now updating $goal ${goal.toMap()}');
 

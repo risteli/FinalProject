@@ -4,22 +4,48 @@ import 'package:final_project/panels/goals/wizard.dart';
 import 'package:flutter/material.dart';
 
 import 'editor.dart';
-import '../../widgets/app_list_detail.dart'; // Add import
+import '../../widgets/app_panels.dart'; // Add import
 import 'browser.dart';
 
 class GoalsPanel extends StatelessWidget {
   const GoalsPanel({
     super.key,
-    this.create = false,
+    required this.navigationStateKey,
   });
 
-  final bool create;
+  final GlobalKey<NavigatorState> navigationStateKey;
 
   @override
   Widget build(BuildContext context) {
-    return AppListDetail(
-      one: GoalBrowserView(),
-      two: GoalWizard(),
+    return Navigator(
+      key: navigationStateKey,
+      onGenerateRoute: (RouteSettings settings) {
+        final page = switch (settings.name) {
+          routeHome => AppPanels(
+              singleLayout: GoalBrowserView(
+                  onSelected: (context) => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const GoalWizard(),
+                    ),
+                  ),
+              ),
+              doubleLayoutLeft: const GoalBrowserView(),
+              doubleLayoutRight: const GoalWizard(),
+            ),
+          routeCreateTask => AppPanels(
+            singleLayout: const GoalWizard(create: true,),
+            doubleLayoutLeft: const GoalBrowserView(),
+            doubleLayoutRight: const GoalWizard(create: true),
+          ),
+          _ => throw StateError('Invalid route: ${settings.name}'),
+        };
+
+        return MaterialPageRoute(
+          builder: (_) => page,
+          settings: settings,
+        );
+      },
     );
   }
 }
