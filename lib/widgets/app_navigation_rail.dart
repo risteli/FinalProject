@@ -9,11 +9,13 @@ class AppNavigationRail extends StatelessWidget {
     required this.backgroundColor,
     required this.selectedIndex,
     this.onDestinationSelected,
+    this.onCreateButtonPressed,
   });
 
   final Color backgroundColor;
   final int selectedIndex;
   final ValueChanged<int>? onDestinationSelected;
+  final Function()? onCreateButtonPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +25,9 @@ class AppNavigationRail extends StatelessWidget {
       onDestinationSelected: onDestinationSelected,
       leading: Column(
         children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu),
-          ),
-          const SizedBox(height: 8),
           AppFloatingActionButton(
             elevation: 0,
-            onPressed: () {},
+            onPressed: onCreateButtonPressed,
             child: const Icon(Icons.add),
           ),
         ],

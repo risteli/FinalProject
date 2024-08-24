@@ -10,7 +10,10 @@ import 'browser.dart';
 class GoalsPanel extends StatelessWidget {
   const GoalsPanel({
     super.key,
+    this.create = false,
   });
+
+  final bool create;
 
   @override
   Widget build(BuildContext context) {

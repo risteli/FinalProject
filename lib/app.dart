@@ -25,6 +25,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000;
+    bool create = false;
 
     return Scaffold(
       body: Row(
@@ -38,6 +39,7 @@ class _AppState extends State<App> {
                   log('selecting navigation $index');
                 });
               },
+              onCreateButtonPressed: () => log('pressed create button on double page'),
             ),
           Expanded(
             child: Container(
@@ -53,7 +55,7 @@ class _AppState extends State<App> {
       floatingActionButton: doubleRail
           ? null
           : AppFloatingActionButton(
-              onPressed: () {},
+              onPressed: () => log('pressed create button on single page'),
               child: const Icon(Icons.add),
             ),
       bottomNavigationBar: doubleRail
