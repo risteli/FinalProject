@@ -25,6 +25,7 @@ class _GoalWizardState extends State<GoalWizard> {
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _backgroundColor = Color.alphaBlend(
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   int _step = 1;
 
@@ -39,6 +40,8 @@ class _GoalWizardState extends State<GoalWizard> {
           goalsRepo.update(goal).then((_) => log('goal update completed'));
           return;
         });
+
+    log('using form $_formKey');
 
     Widget wizardControls = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -65,36 +68,40 @@ class _GoalWizardState extends State<GoalWizard> {
     return Scaffold(
       backgroundColor: _backgroundColor,
       appBar: AppBar(
-          backgroundColor: _backgroundColor,
-          title: const Text('Here you can define your goal')),
+        backgroundColor: _backgroundColor,
+        title: const Text('Here you can define your goal'),
+      ),
       body: Card(
         color: _backgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-          child: Consumer<GoalsModel>(
-            builder: (context, goals, _) => switch (_step) {
-              1 => GoalSlideName(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: updateGoal,
-                ),
-              2 => GoalSlideType(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: updateGoal,
-                ),
-              3 => GoalSlideTool(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: updateGoal,
-                ),
-              4 => GoalSlideTasks(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: updateGoal,
-                ),
-              _ => const Text('invalid state'),
-            },
+          child: Form(
+            key: _formKey,
+            child: Consumer<GoalsModel>(
+              builder: (context, goals, _) => switch (_step) {
+                1 => GoalSlideName(
+                    goal: goal,
+                    controls: wizardControls,
+                    onSubmitted: updateGoal,
+                  ),
+                2 => GoalSlideType(
+                    goal: goal,
+                    controls: wizardControls,
+                    onSubmitted: updateGoal,
+                  ),
+                3 => GoalSlideTool(
+                    goal: goal,
+                    controls: wizardControls,
+                    onSubmitted: updateGoal,
+                  ),
+                4 => GoalSlideTasks(
+                    goal: goal,
+                    controls: wizardControls,
+                    onSubmitted: updateGoal,
+                  ),
+                _ => const Text('invalid state'),
+              },
+            ),
           ),
         ),
       ),
@@ -103,7 +110,7 @@ class _GoalWizardState extends State<GoalWizard> {
 }
 
 class GoalSlideName extends StatefulWidget {
-  GoalSlideName({
+  const GoalSlideName({
     super.key,
     required this.goal,
     this.controls,
@@ -150,7 +157,7 @@ class _GoalSlideNameState extends State<GoalSlideName> {
 }
 
 class GoalSlideType extends StatefulWidget {
-  GoalSlideType({
+  const GoalSlideType({
     super.key,
     required this.goal,
     this.controls,
@@ -190,6 +197,7 @@ class _GoalSlideTypeState extends State<GoalSlideType> {
           ],
           selected: goalTypeSet,
           showSelectedIcon: false,
+          emptySelectionAllowed: true,
           onSelectionChanged: (Set<GoalType> values) {
             widget.goal.goalType = values.first;
             log('update for goal type: ${widget.goal.goalType}');
@@ -203,7 +211,7 @@ class _GoalSlideTypeState extends State<GoalSlideType> {
 }
 
 class GoalSlideTool extends StatefulWidget {
-  GoalSlideTool({
+  const GoalSlideTool({
     super.key,
     required this.goal,
     this.controls,
@@ -253,7 +261,7 @@ class _GoalSlideToolState extends State<GoalSlideTool> {
 }
 
 class GoalSlideTasks extends StatefulWidget {
-  GoalSlideTasks({
+  const GoalSlideTasks({
     super.key,
     required this.goal,
     this.controls,

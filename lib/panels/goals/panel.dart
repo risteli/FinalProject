@@ -17,6 +17,7 @@ class GoalsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('navigation key ${navigationStateKey}');
     return Navigator(
       key: navigationStateKey,
       onGenerateRoute: (RouteSettings settings) {
@@ -33,7 +34,7 @@ class GoalsPanel extends StatelessWidget {
               doubleLayoutLeft: const GoalBrowserView(),
               doubleLayoutRight: const GoalWizard(),
             ),
-          routeCreateTask => AppPanels(
+          routeCreateTask => const AppPanels(
             singleLayout: const GoalWizard(create: true,),
             doubleLayoutLeft: const GoalBrowserView(),
             doubleLayoutRight: const GoalWizard(create: true),

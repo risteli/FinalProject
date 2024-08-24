@@ -48,9 +48,9 @@ class _TaskListState extends State<TaskList> {
               task: task,
             ),
           TextField(
-            key: Key('task-new'),
+            key: const Key('task-new'),
             controller: newTaskController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               prefixIcon: Icon(Icons.add),
               labelText: 'You can add a new task here',
             ),

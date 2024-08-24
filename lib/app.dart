@@ -21,11 +21,11 @@ class _AppState extends State<App> {
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _backgroundColor = Color.alphaBlend(
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
+  final navigatorStateKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000;
-    final navigatorStateKey = GlobalKey<NavigatorState>();
 
     return Scaffold(
       body: Row(
