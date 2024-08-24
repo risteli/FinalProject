@@ -7,7 +7,6 @@ import 'dart:developer';
 
 class GoalsModel extends ChangeNotifier {
   final List<Goal> _items = [];
-  int? _selected;
 
   GoalsModel();
 
@@ -17,22 +16,14 @@ class GoalsModel extends ChangeNotifier {
 
   UnmodifiableListView<Goal> get items => UnmodifiableListView(_items);
 
-  int? get selected => _selected;
-
   void load(List<Goal> items) {
     _items.clear();
     _items.addAll(items);
     notifyListeners();
   }
 
-  set select(int index) {
-    _selected = index;
-    notifyListeners();
-  }
-
   void add(Goal value) {
     _items.add(value);
-    _selected ??= 0;
     notifyListeners();
   }
 
@@ -48,7 +39,6 @@ class GoalsModel extends ChangeNotifier {
 
   void clear() {
     _items.clear();
-    _selected = null;
     notifyListeners();
   }
 }

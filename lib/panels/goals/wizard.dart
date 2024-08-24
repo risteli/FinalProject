@@ -11,10 +11,10 @@ import 'task_editor.dart';
 class GoalWizard extends StatefulWidget {
   const GoalWizard({
     super.key,
-    this.create = false,
+    required this.goal,
   });
 
-  final bool create;
+  final Goal goal;
 
   @override
   State<GoalWizard> createState() => _GoalWizardState();
@@ -32,23 +32,23 @@ class _GoalWizardState extends State<GoalWizard> {
   Widget build(BuildContext context) {
     final goalsModel = Provider.of<GoalsModel>(context);
 
-    log('gws ${goalsModel.items} selected ${goalsModel.selected}');
-
-    late final goal;
-
-    if (widget.create) {
-      goal = Goal();
-    } else if (goalsModel.selected != null) {
-      goal = goalsModel.items[goalsModel.selected!];
-    } else {
-      return const Card();
-    }
+    log('GoalWizard ${goalsModel.items}');
 
     void persistGoal() {
-      if (goal.id == null) {
-        GoalsRepo.instance.create(goal);
+      if (widget.goal.id == null) {
+        GoalsRepo.instance.create(widget.goal).then((_) {
+          setState(() {
+            log('created ${widget.goal}');
+          });
+          return;
+        });
       } else {
-        GoalsRepo.instance.update(goal);
+        GoalsRepo.instance.update(widget.goal).then((_) {
+          setState(() {
+            log('updated ${widget.goal}');
+          });
+          return;
+        });
       }
       return;
     }
@@ -90,22 +90,22 @@ class _GoalWizardState extends State<GoalWizard> {
             child: Consumer<GoalsModel>(
               builder: (context, goals, _) => switch (_step) {
                 1 => GoalSlideName(
-                    goal: goal,
+                    goal: widget.goal,
                     controls: wizardControls,
                     onSubmitted: persistGoal,
                   ),
                 2 => GoalSlideType(
-                    goal: goal,
+                    goal: widget.goal,
                     controls: wizardControls,
                     onSubmitted: persistGoal,
                   ),
                 3 => GoalSlideTool(
-                    goal: goal,
+                    goal: widget.goal,
                     controls: wizardControls,
                     onSubmitted: persistGoal,
                   ),
                 4 => GoalSlideTasks(
-                    goal: goal,
+                    goal: widget.goal,
                     controls: wizardControls,
                     onSubmitted: persistGoal,
                   ),
