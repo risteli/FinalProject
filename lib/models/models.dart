@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 
 class Goal {
   Goal({
-    this.name='',
+    this.name = '',
     this.goalType,
     this.tasks = const [],
   });
@@ -31,7 +31,9 @@ class Goal {
     id = map['id'] as int?;
     name = map['name'] as String;
     position = map['position'] as int;
-    goalType = GoalType.values.byName(map['type'] as String);
+    goalType = map['type'] == null
+        ? null
+        : GoalType.values.byName(map['type'] as String);
 
     var toolString = map['tool'] as String?;
 

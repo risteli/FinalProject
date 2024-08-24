@@ -32,13 +32,16 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
       child: ListView(
         children: [
           const SizedBox(height: 8),
-          search_bar.SearchBar(),
+          const search_bar.SearchBar(),
           const SizedBox(height: 8),
           Consumer<GoalsModel>(
-            builder: (context, goals, _) => GoalBrowserList(
-              goals: goals,
-              onSelected: widget.onSelected,
-            ),
+            builder: (context, goals, _) {
+              log('received new goals model');
+              return GoalBrowserList(
+                goals: goals,
+                onSelected: widget.onSelected,
+              );
+            },
           ),
         ],
       ),
@@ -63,7 +66,9 @@ class GoalBrowserList extends StatefulWidget {
 class _GoalBrowserListState extends State<GoalBrowserList> {
   @override
   Widget build(BuildContext context) {
-    final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
+    final goalsRepo = GoalsRepo();
+
+    log('building GoalBrowserList ${widget.goals.items}');
 
     return ReorderableListView(
       shrinkWrap: true,

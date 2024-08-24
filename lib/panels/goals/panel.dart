@@ -35,9 +35,9 @@ class GoalsPanel extends StatelessWidget {
               doubleLayoutRight: const GoalWizard(),
             ),
           routeCreateTask => const AppPanels(
-            singleLayout: const GoalWizard(create: true,),
-            doubleLayoutLeft: const GoalBrowserView(),
-            doubleLayoutRight: const GoalWizard(create: true),
+            singleLayout: GoalWizard(create: true,),
+            doubleLayoutLeft: GoalBrowserView(),
+            doubleLayoutRight: GoalWizard(create: true),
           ),
           _ => throw StateError('Invalid route: ${settings.name}'),
         };

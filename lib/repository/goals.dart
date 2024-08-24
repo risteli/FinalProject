@@ -8,26 +8,35 @@ import '../models/roots.dart';
 import '../models/models.dart';
 
 class GoalsRepo {
-  GoalsRepo._privateConstructor(this.db);
-
-  Database db;
+  GoalsRepo._privateConstructor() {
+    db = AppDatabase.instance.database;
+    goals = GoalsModel();
+  }
 
   static GoalsRepo? _instance;
 
-  factory GoalsRepo(AppDatabase appdb) {
-    _instance ??= GoalsRepo._privateConstructor(appdb.database);
+  late final Database db;
+  late final GoalsModel goals;
+
+  factory GoalsRepo() {
+    _instance ??= GoalsRepo._privateConstructor();
     return _instance!;
   }
 
-  Future<GoalsModel> readAll() async {
+  static GoalsRepo get instance => _instance!;
+
+  Future<GoalsModel> load() async {
+    log('goalsrepo load called');
+
     var rawGoals = await db.query('goals', orderBy: 'position');
-    var goals = GoalsModel();
 
     Map<int, Goal> goalById = {};
 
+    List<Goal> loadedGoals = [];
+
     for (var rawGoal in rawGoals) {
       var goal = Goal.fromMap(rawGoal);
-      goals.add(goal);
+      loadedGoals.add(goal);
       goalById[goal.id!] = goal;
     }
 
@@ -37,10 +46,18 @@ class GoalsRepo {
       goalById[task.goalId!]!.tasks.add(task);
     }
 
+    goals.load(loadedGoals);
+
     return goals;
   }
 
   Future create(Goal goal) async {
+    if (goals.items.isNotEmpty) {
+      goal.position = goals.items
+          .reduce((v, e) => e.position > v.position ? e : v)
+          .position + 1;
+    }
+
     log('now creating $goal ${goal.toMap()}');
 
     goal.id = await db.insert(AppDatabase.goalsTable, goal.toMap());
@@ -82,8 +99,7 @@ class GoalsRepo {
     var idsPlaceholders = List.filled(ids.length, '?').join(',');
 
     await db.delete(AppDatabase.goalsTable,
-        where: 'id NOT IN (${idsPlaceholders})',
-        whereArgs: ids);
+        where: 'id NOT IN (${idsPlaceholders})', whereArgs: ids);
   }
 
   Future updateTasks(Goal goal) async {

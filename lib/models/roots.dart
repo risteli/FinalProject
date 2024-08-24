@@ -19,9 +19,9 @@ class GoalsModel extends ChangeNotifier {
 
   int? get selected => _selected;
 
-  void replace(GoalsModel rest) {
+  void load(List<Goal> items) {
     _items.clear();
-    _items.addAll(rest.items);
+    _items.addAll(items);
     notifyListeners();
   }
 

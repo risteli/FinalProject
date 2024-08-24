@@ -17,9 +17,9 @@ class GoalsAsyncLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<GoalsModel>(
-        future: GoalsRepo(Provider.of<AppDatabase>(context)).readAll(),
-        builder: (BuildContext context, AsyncSnapshot<GoalsModel> snapshot) {
+    return FutureBuilder(
+        future: GoalsRepo.instance.load(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasError) {
             return Center(
               child: Column(
@@ -50,8 +50,11 @@ class GoalsAsyncLoader extends StatelessWidget {
             );
           }
 
-          return ChangeNotifierProvider(
-            create: (_) => snapshot.data!,
+          return ChangeNotifierProvider<GoalsModel>(
+            create: (_) {
+              log('CNP goals model');
+              return GoalsRepo.instance.goals;
+            },
             child: child,
           );
         });

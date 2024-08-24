@@ -32,8 +32,6 @@ class _TaskTileState extends State<TaskTile> {
 
   @override
   Widget build(BuildContext context) {
-    final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
-
     Widget nameField;
 
     if (isEditing) {
@@ -49,7 +47,7 @@ class _TaskTileState extends State<TaskTile> {
         onSubmitted: (value) {
           setState(() {
             widget.task.name = value;
-            goalsRepo.updateTask(widget.task);
+            GoalsRepo.instance.updateTask(widget.task);
             isEditing = false;
           });
         },
@@ -67,7 +65,7 @@ class _TaskTileState extends State<TaskTile> {
         child: Icon(widget.task.repeatable ? Icons.repeat_on : Icons.repeat),
         onTap: () => setState(() {
           widget.task.repeatable = !widget.task.repeatable;
-          goalsRepo.updateTask(widget.task);
+          GoalsRepo.instance.updateTask(widget.task);
         }),
       ),
       trailing: Row(
@@ -85,7 +83,7 @@ class _TaskTileState extends State<TaskTile> {
                   TextButton(
                       onPressed: () => setState(() {
                             widget.goal.tasks.remove(widget.task);
-                            goalsRepo.updateTasks(widget.goal);
+                            GoalsRepo.instance.updateTasks(widget.goal);
                             Navigator.pop(context, 'Delete');
                           }),
                       child: const Text('Delete')),

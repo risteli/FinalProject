@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:final_project/repository/database.dart';
 import 'package:final_project/repository/goals.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,17 +30,28 @@ class _GoalWizardState extends State<GoalWizard> {
 
   @override
   Widget build(BuildContext context) {
-    final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
     final goalsModel = Provider.of<GoalsModel>(context);
-    final goal =
-        widget.create ? Goal() : goalsModel.items[goalsModel.selected!];
 
-    void updateGoal() => setState(() {
-          goalsRepo.update(goal).then((_) => log('goal update completed'));
-          return;
-        });
+    log('gws ${goalsModel.items} selected ${goalsModel.selected}');
 
-    log('using form $_formKey');
+    late final goal;
+
+    if (widget.create) {
+      goal = Goal();
+    } else if (goalsModel.selected != null) {
+      goal = goalsModel.items[goalsModel.selected!];
+    } else {
+      return const Card();
+    }
+
+    void persistGoal() {
+      if (goal.id == null) {
+        GoalsRepo.instance.create(goal);
+      } else {
+        GoalsRepo.instance.update(goal);
+      }
+      return;
+    }
 
     Widget wizardControls = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -82,22 +92,22 @@ class _GoalWizardState extends State<GoalWizard> {
                 1 => GoalSlideName(
                     goal: goal,
                     controls: wizardControls,
-                    onSubmitted: updateGoal,
+                    onSubmitted: persistGoal,
                   ),
                 2 => GoalSlideType(
                     goal: goal,
                     controls: wizardControls,
-                    onSubmitted: updateGoal,
+                    onSubmitted: persistGoal,
                   ),
                 3 => GoalSlideTool(
                     goal: goal,
                     controls: wizardControls,
-                    onSubmitted: updateGoal,
+                    onSubmitted: persistGoal,
                   ),
                 4 => GoalSlideTasks(
                     goal: goal,
                     controls: wizardControls,
-                    onSubmitted: updateGoal,
+                    onSubmitted: persistGoal,
                   ),
                 _ => const Text('invalid state'),
               },
@@ -136,6 +146,7 @@ class _GoalSlideNameState extends State<GoalSlideName> {
 
   @override
   Widget build(BuildContext context) {
+    log('now slide name ${widget.goal.name}');
     nameController.text = widget.goal.name ?? "";
 
     return Column(

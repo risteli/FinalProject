@@ -30,7 +30,6 @@ class _TaskListState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
-    final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
     final tasks = widget.goal.tasks;
 
     return Expanded(
@@ -38,7 +37,7 @@ class _TaskListState extends State<TaskList> {
         onReorder: (int oldIndex, int newIndex) {
           log('reorder $oldIndex to $newIndex');
           setState(() => tasks.insert(newIndex, tasks.removeAt(oldIndex)));
-          goalsRepo.updateTasks(widget.goal);
+          GoalsRepo.instance.updateTasks(widget.goal);
         },
         children: [
           for (var task in tasks)
@@ -63,7 +62,7 @@ class _TaskListState extends State<TaskList> {
                 );
                 tasks.add(task);
                 newTaskController.clear();
-                goalsRepo.createTask(task);
+                GoalsRepo.instance.createTask(task);
               });
             },
           ),

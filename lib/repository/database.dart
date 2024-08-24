@@ -101,17 +101,12 @@ class AppDatabaseMigrations {
   }
 }
 
-class AppDatabase {
-  static const goalsTable = 'goals';
-  static const tasksTable = 'tasks';
+class AppDatabaseInit {
+  AppDatabaseInit._privateConstructor();
 
-  static AppDatabase? _instance;
+  late final Database _database;
 
-  AppDatabase._privateConstructor(this._database);
-
-  final Database _database;
-
-  static Future<Database> _init() async {
+  static Future<AppDatabase> init() async {
     String dbName = join(await getDatabasesPath(), 'taskchisel.db');
 
     if (false) // enable to drop the db and rebuild it
@@ -128,16 +123,8 @@ class AppDatabase {
         .getVersion()
         .then((version) => log('db ready version=${version}'));
 
-    return database;
+    return AppDatabase(database);
   }
-
-  static Future<AppDatabase> get instance async {
-    _instance ??= AppDatabase._privateConstructor(await _init());
-
-    return _instance!;
-  }
-
-  Database get database => _database;
 
   static void _migrate(db, version) async {
     var _migrations = AppDatabaseMigrations();
@@ -147,4 +134,27 @@ class AppDatabase {
 
     _migrations.addFixture(db);
   }
+}
+
+
+class AppDatabase {
+  static const goalsTable = 'goals';
+  static const tasksTable = 'tasks';
+
+  static AppDatabase? _instance;
+
+  AppDatabase._privateConstructor(this._database);
+
+  final Database _database;
+
+  factory AppDatabase(Database database) {
+    _instance ??= AppDatabase._privateConstructor(database);
+
+    return _instance!;
+  }
+
+  static AppDatabase get instance => _instance!;
+
+  Database get database => _database;
+
 }

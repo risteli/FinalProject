@@ -30,12 +30,13 @@ class _GoalEditorState extends State<GoalEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final goalsRepo = GoalsRepo(Provider.of<AppDatabase>(context));
     final goalsModel = Provider.of<GoalsModel>(context);
     final goal = goalsModel.items[goalsModel.selected!];
 
     void updateGoal() => setState(() {
-          goalsRepo.update(goal).then((_) => log('goal update completed'));
+          GoalsRepo.instance
+              .update(goal)
+              .then((_) => log('goal update completed'));
           return;
         });
 
