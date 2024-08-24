@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:final_project/panels/goals/wizard.dart';
 import 'package:flutter/material.dart';
 
 import 'editor.dart';
@@ -15,7 +16,7 @@ class GoalsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppListDetail(
       one: GoalBrowserView(),
-      two: GoalEditor(),
+      two: GoalWizard(),
     );
   }
 }

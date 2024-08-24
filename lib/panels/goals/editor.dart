@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:final_project/panels/goals/wizard.dart';
 import 'package:final_project/repository/database.dart';
 import 'package:final_project/repository/goals.dart';
 import 'package:flutter/material.dart';
@@ -58,66 +59,20 @@ class _GoalEditorState extends State<GoalEditor> {
               children: [
                 Text("Describe your goal.", style: TextStyle(fontSize: 24)),
                 SizedBox(height: 8),
-                Text("What do you want to accomplish?",
-                    style: TextStyle(fontSize: 12)),
-                TextField(
-                  controller: nameController,
-                  onSubmitted: (value) {
-                    goal.name = value;
-                    updateGoal();
-                  },
+                GoalSlideName(
+                  goal: goal,
+                  onSubmitted: updateGoal,
                 ),
                 SizedBox(height: 16),
-                Text("What best describes your goal?",
-                    style: TextStyle(fontSize: 12)),
-                SizedBox(height: 12),
-                SegmentedButton<GoalType>(
-                  segments: <ButtonSegment<GoalType>>[
-                    ...GoalType.values.map(
-                      (goalType) => ButtonSegment<GoalType>(
-                        icon: Icon(goalType.icon),
-                        label: Text(goalType.description),
-                        value: goalType,
-                      ),
-                    ),
-                  ],
-                  selected: goalTypeSet,
-                  showSelectedIcon: false,
-                  onSelectionChanged: (Set<GoalType> values) {
-                    log('update for goal type: ${values.first}');
-                    goal.goalType = values.first;
-                    updateGoal();
-                  },
+                GoalSlideType(
+                  goal: goal,
+                  onSubmitted: updateGoal,
                 ),
                 SizedBox(height: 16),
-                Text("Which tools could be useful to progress on your goal?",
-                    style: TextStyle(fontSize: 12)),
-                SizedBox(height: 12),
-                SegmentedButton<ToolType>(
-                  segments: <ButtonSegment<ToolType>>[
-                    ...ToolType.values.map(
-                      (toolType) => ButtonSegment<ToolType>(
-                        icon: Icon(toolType.icon),
-                        label: Text(toolType.description),
-                        value: toolType,
-                      ),
-                    ),
-                  ],
-                  selected: goal.tool,
-                  showSelectedIcon: false,
-                  multiSelectionEnabled: true,
-                  emptySelectionAllowed: true,
-                  onSelectionChanged: (Set<ToolType> values) {
-                    log('update for tool type: ${values.first}');
-                    goal.tool = values;
-                    updateGoal();
-                  },
+                GoalSlideTool(
+                  goal: goal,
+                  onSubmitted: updateGoal,
                 ),
-                SizedBox(height: 16),
-                Text("List the tasks needed to accomplish your goal:",
-                    style: TextStyle(fontSize: 12)),
-                SizedBox(height: 8),
-                TaskList(goal: goal)
               ],
             ),
           ),

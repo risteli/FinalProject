@@ -19,14 +19,11 @@ class GoalWizard extends StatefulWidget {
 }
 
 class _GoalWizardState extends State<GoalWizard> {
-  final nameController = TextEditingController();
-  int step = 1;
+  late final _colorScheme = Theme.of(context).colorScheme;
+  late final _backgroundColor = Color.alphaBlend(
+      _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    super.dispose();
-  }
+  int _step = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -39,118 +36,245 @@ class _GoalWizardState extends State<GoalWizard> {
           return;
         });
 
-    nameController.text = goal.name ?? "";
-
-    final goalTypeSet = <GoalType>{};
-    if (goal.goalType != null) {
-      goalTypeSet.add(goal.goalType!);
-    }
+    Widget wizardControls = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        if (_step > 1)
+          ElevatedButton(
+            onPressed: () => setState(() => _step--),
+            child: const Text('prev'),
+          ),
+        if (_step < 4)
+          ElevatedButton(
+            onPressed: () => setState(() => _step++),
+            child: const Text('next'),
+            //style: ElevatedButton.styleFrom(backgroundColor: _colorScheme.secondary, textStyle: TextStyle(color: _colorScheme.surface)),
+          ),
+        if (_step == 4)
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('done'),
+          ),
+      ],
+    );
 
     return Scaffold(
-      appBar: AppBar(title: Text('Describe your goal')),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 28.0),
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.0),
-            child: Consumer<GoalsModel>(
-              builder: (context, goals, _) => Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: switch (step) {
-                      1 => <Widget>[
-                          Text(
-                            "What do you want to accomplish?",
-                            style: TextStyle(fontSize: 12),
-                          ),
-                          TextField(
-                            controller: nameController,
-                            onSubmitted: (value) {
-                              goal.name = value;
-                              updateGoal();
-                            },
-                          ),
-                        ],
-                      2 => <Widget>[
-                          Text("What best describes your goal?",
-                              style: TextStyle(fontSize: 12)),
-                          SegmentedButton<GoalType>(
-                            segments: <ButtonSegment<GoalType>>[
-                              ...GoalType.values.map(
-                                (goalType) => ButtonSegment<GoalType>(
-                                  icon: Icon(goalType.icon),
-                                  label: Text(goalType.description),
-                                  value: goalType,
-                                ),
-                              ),
-                            ],
-                            selected: goalTypeSet,
-                            showSelectedIcon: false,
-                            onSelectionChanged: (Set<GoalType> values) {
-                              log('update for goal type: ${values.first}');
-                              goal.goalType = values.first;
-                              updateGoal();
-                            },
-                          ),
-                        ],
-                      3 => <Widget>[
-                          Text(
-                              "Which tools could be useful to progress on your goal?",
-                              style: TextStyle(fontSize: 12)),
-                          SegmentedButton<ToolType>(
-                            segments: <ButtonSegment<ToolType>>[
-                              ...ToolType.values.map(
-                                (toolType) => ButtonSegment<ToolType>(
-                                  icon: Icon(toolType.icon),
-                                  label: Text(toolType.description),
-                                  value: toolType,
-                                ),
-                              ),
-                            ],
-                            selected: goal.tool,
-                            showSelectedIcon: false,
-                            multiSelectionEnabled: true,
-                            emptySelectionAllowed: true,
-                            onSelectionChanged: (Set<ToolType> values) {
-                              log('update for tool type: ${values.first}');
-                              goal.tool = values;
-                              updateGoal();
-                            },
-                          ),
-                        ],
-                      4 => <Widget>[
-                          Text("List the tasks needed to accomplish your goal:",
-                              style: TextStyle(fontSize: 12)),
-                          TaskList(goal: goal)
-                        ],
-                      _ => <Widget>[Text('invalid state')],
-                    } +
-                    <Widget>[
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                        if (step > 1)
-                          ElevatedButton(
-                            onPressed: () => setState(() => step--),
-                            child: const Text('prev'),
-                          ),
-                        if (step < 4)
-                          ElevatedButton(
-                            onPressed: () => setState(() => step++),
-                            child: const Text('next'),
-                          ),
-                        if (step == 4)
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('done'),
-                          ),
-                      ])
-                    ],
-              ),
-            ),
+      backgroundColor: _backgroundColor,
+      appBar: AppBar(
+          backgroundColor: _backgroundColor,
+          title:const Text('Here you can define your goal')),
+      body: Card(
+        color: _backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          child: Consumer<GoalsModel>(
+            builder: (context, goals, _) => switch (_step) {
+              1 => GoalSlideName(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: updateGoal,
+                ),
+              2 => GoalSlideType(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: updateGoal,
+                ),
+              3 => GoalSlideTool(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: updateGoal,
+                ),
+              4 => GoalSlideTasks(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: updateGoal,
+                ),
+              _ => const Text('invalid state'),
+            },
           ),
         ),
       ),
+    );
+  }
+}
+
+class GoalSlideName extends StatefulWidget {
+  GoalSlideName({
+    super.key,
+    required this.goal,
+    this.controls,
+    required this.onSubmitted,
+  });
+
+  final Goal goal;
+  final Widget? controls;
+  final void Function() onSubmitted;
+
+  @override
+  State<GoalSlideName> createState() => _GoalSlideNameState();
+}
+
+class _GoalSlideNameState extends State<GoalSlideName> {
+  final nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    nameController.text = widget.goal.name ?? "";
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        const Text("What do you want to accomplish?"),
+        TextField(
+            controller: nameController,
+            onSubmitted: (value) {
+              widget.goal.name = value;
+              log('update for goal name: ${widget.goal.name}');
+              widget.onSubmitted();
+            }),
+        if (widget.controls != null) widget.controls!,
+      ],
+    );
+  }
+}
+
+class GoalSlideType extends StatefulWidget {
+  GoalSlideType({
+    super.key,
+    required this.goal,
+    this.controls,
+    required this.onSubmitted,
+  });
+
+  final Goal goal;
+  final Widget? controls;
+  final void Function() onSubmitted;
+
+  @override
+  State<GoalSlideType> createState() => _GoalSlideTypeState();
+}
+
+class _GoalSlideTypeState extends State<GoalSlideType> {
+  @override
+  Widget build(BuildContext context) {
+    final goalTypeSet = <GoalType>{};
+    if (widget.goal.goalType != null) {
+      goalTypeSet.add(widget.goal.goalType!);
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        const Text("What best describes your goal?"),
+        SegmentedButton<GoalType>(
+          segments: <ButtonSegment<GoalType>>[
+            ...GoalType.values.map(
+              (goalType) => ButtonSegment<GoalType>(
+                icon: Icon(goalType.icon),
+                label: Text(goalType.description),
+                value: goalType,
+              ),
+            ),
+          ],
+          selected: goalTypeSet,
+          showSelectedIcon: false,
+          onSelectionChanged: (Set<GoalType> values) {
+            widget.goal.goalType = values.first;
+            log('update for goal type: ${widget.goal.goalType}');
+            widget.onSubmitted();
+          },
+        ),
+        if (widget.controls != null) widget.controls!,
+      ],
+    );
+  }
+}
+
+class GoalSlideTool extends StatefulWidget {
+  GoalSlideTool({
+    super.key,
+    required this.goal,
+    this.controls,
+    required this.onSubmitted,
+  });
+
+  final Goal goal;
+  final Widget? controls;
+  final void Function() onSubmitted;
+
+  @override
+  State<GoalSlideTool> createState() => _GoalSlideToolState();
+}
+
+class _GoalSlideToolState extends State<GoalSlideTool> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        const Text("Which tools could be useful to progress on your goal?"),
+        SegmentedButton<ToolType>(
+          segments: <ButtonSegment<ToolType>>[
+            ...ToolType.values.map(
+              (toolType) => ButtonSegment<ToolType>(
+                icon: Icon(toolType.icon),
+                label: Text(toolType.description),
+                value: toolType,
+              ),
+            ),
+          ],
+          selected: widget.goal.tool,
+          showSelectedIcon: false,
+          multiSelectionEnabled: true,
+          emptySelectionAllowed: true,
+          onSelectionChanged: (Set<ToolType> values) {
+            widget.goal.tool = values;
+            log('update for tool type: ${widget.goal.tool}');
+            widget.onSubmitted();
+          },
+        ),
+        if (widget.controls != null) widget.controls!,
+      ],
+    );
+  }
+}
+
+class GoalSlideTasks extends StatefulWidget {
+  GoalSlideTasks({
+    super.key,
+    required this.goal,
+    this.controls,
+    required this.onSubmitted,
+  });
+
+  final Goal goal;
+  final Widget? controls;
+  final void Function() onSubmitted;
+
+  @override
+  State<GoalSlideTasks> createState() => _GoalSlideTasksState();
+}
+
+class _GoalSlideTasksState extends State<GoalSlideTasks> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        const Text("List the tasks needed to accomplish your goal:"),
+        TaskList(goal: widget.goal),
+        if (widget.controls != null) widget.controls!,
+      ],
     );
   }
 }
