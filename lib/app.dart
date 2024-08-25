@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:final_project/panels/goals/panel.dart';
 import 'package:final_project/panels/goals/loader.dart';
+import 'package:final_project/panels/goals/runner.dart';
 import 'package:flutter/material.dart';
 
 import 'destinations.dart';
@@ -22,7 +23,9 @@ class _AppState extends State<App> {
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _backgroundColor = Color.alphaBlend(
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
+
   final goalsNavigatorStateKey = GlobalKey<NavigatorState>();
+  final runnerNavigatorStateKey = GlobalKey<NavigatorState>();
 
   late final List<Destination> destinations = <Destination>[
     Destination(
@@ -34,10 +37,14 @@ class _AppState extends State<App> {
         ),
       ),
     ),
-    const Destination(
+    Destination(
       icon: Icons.schedule_outlined,
       label: 'Run',
-      widget: Text('Run placeholder'),
+      widget: GoalsAsyncLoader(
+        child: RunnerPanel(
+          navigationStateKey: runnerNavigatorStateKey,
+        ),
+      ),
     ),
     const Destination(
       icon: Icons.emoji_events_outlined,
