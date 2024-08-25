@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../destinations.dart';
-import 'app_floating_action_button.dart'; // Add this import
+import 'app_floating_action_button.dart';
 
 class AppNavigationRail extends StatefulWidget {
   const AppNavigationRail({

@@ -2,8 +2,6 @@ import 'dart:developer';
 
 import 'task_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../repository/database.dart';
 import '../../models/models.dart';
 import '../../repository/goals.dart';
 

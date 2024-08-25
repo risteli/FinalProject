@@ -1,10 +1,8 @@
 import 'dart:developer';
 
-import 'package:final_project/repository/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../destinations.dart';
 import '../../models/roots.dart';
 import '../../repository/goals.dart';
 

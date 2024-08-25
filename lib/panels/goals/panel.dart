@@ -6,8 +6,11 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../models/roots.dart';
-import '../../widgets/app_panels.dart'; // Add import
+import '../../widgets/app_panels.dart';
 import 'browser.dart';
+
+const routeEditGoals = '/';
+const routeCreateGoal = '/create-goal';
 
 class GoalsPanel extends StatelessWidget {
   const GoalsPanel({
@@ -28,8 +31,8 @@ class GoalsPanel extends StatelessWidget {
         log('route changed ${settings.name}');
 
         final page = switch (settings.name) {
-          routeHome => _EditGoals(),
-          routeCreateTask => _CreateGoal(),
+          routeEditGoals => _EditGoals(),
+          routeCreateGoal => _CreateGoal(),
           _ => throw StateError('Invalid route: ${settings.name}'),
         };
 

@@ -1,14 +1,9 @@
 import 'dart:developer';
 
-import 'package:final_project/panels/goals/wizard.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../repository/database.dart';
 import '../../models/roots.dart';
 
 import '../../repository/goals.dart';
-import '../../widgets/app_panels.dart';
 import 'goal_tile.dart';
 import '../../widgets/search_bar.dart' as search_bar;
 

@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:final_project/app.dart';
 import 'package:final_project/repository/database.dart';
 import 'package:sqflite/sqflite.dart';
 

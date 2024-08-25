@@ -64,7 +64,7 @@ class _AppState extends State<App> {
               onDestinationSelected: (index) =>
                   setState(() => currentIndex = index),
               onCreateButtonPressed: () => goalsNavigatorStateKey.currentState!
-                  .pushNamed('/create-task'),
+                  .pushNamed(routeCreateGoal),
             ),
           Expanded(
             child: Container(
@@ -81,7 +81,7 @@ class _AppState extends State<App> {
           ? null
           : AppFloatingActionButton(
               onPressed: () => goalsNavigatorStateKey.currentState!
-                  .pushNamed('/create-task'),
+                  .pushNamed(routeCreateGoal),
               child: const Icon(Icons.add),
             ),
       bottomNavigationBar: doubleRail

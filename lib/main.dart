@@ -3,9 +3,6 @@ import 'dart:developer';
 import 'package:final_project/repository/database.dart';
 import 'package:final_project/repository/goals.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 
 import 'app.dart';
 

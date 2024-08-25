@@ -1,10 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-const routeHome = '/';
-const routeCreateTask = '/create-task';
 
 class AppLayout extends ChangeNotifier {
   AppLayout(this._singlePanel);
