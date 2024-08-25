@@ -27,34 +27,50 @@ class GoalsRepo {
   Future<GoalsModel> load() async {
     log('goalsrepo load called');
 
-    var rawGoals = await db.query('goals', orderBy: 'position');
+    var rawGoals = await db.query(
+      'goals',
+      where: 'active=1',
+      orderBy: 'position',
+    );
 
     Map<int, Goal> goalById = {};
 
     List<Goal> loadedGoals = [];
 
+    log('now loading rawGoals');
     for (var rawGoal in rawGoals) {
       var goal = Goal.fromMap(rawGoal);
       loadedGoals.add(goal);
       goalById[goal.id!] = goal;
     }
 
-    var rawTasks = await db.query('tasks', orderBy: 'position');
+    var rawTasks = await db.query(
+      'tasks',
+      where: 'active=1 AND goal_id IN (SELECT id FROM goals WHERE active=1)',
+      orderBy: 'position',
+    );
+
+    log('now loading rawTasks');
     for (var rawTask in rawTasks) {
       var task = Task.fromMap(rawTask);
       goalById[task.goalId!]!.tasks.add(task);
     }
+    log('done loading rawTasks');
 
     goals.load(loadedGoals);
+    log('goals now loaded');
 
+
+    log('all set $loadedGoals');
     return goals;
   }
 
   Future create(Goal goal) async {
     if (goals.items.isNotEmpty) {
       goal.position = goals.items
-          .reduce((v, e) => e.position > v.position ? e : v)
-          .position + 1;
+              .reduce((v, e) => e.position > v.position ? e : v)
+              .position +
+          1;
     }
 
     log('now creating $goal ${goal.toMap()}');
@@ -97,8 +113,12 @@ class GoalsRepo {
 
     var idsPlaceholders = List.filled(ids.length, '?').join(',');
 
-    await db.delete(AppDatabase.goalsTable,
-        where: 'id NOT IN (${idsPlaceholders})', whereArgs: ids);
+    await db.update(
+      AppDatabase.goalsTable,
+      {'active': 0},
+      where: 'id NOT IN (${idsPlaceholders})',
+      whereArgs: ids,
+    );
   }
 
   Future updateTasks(Goal goal) async {
@@ -129,9 +149,12 @@ class GoalsRepo {
 
     var idsPlaceholders = List.filled(ids.length, '?').join(',');
 
-    await db.delete(AppDatabase.tasksTable,
-        where: 'goal_id=? AND id NOT IN (${idsPlaceholders})',
-        whereArgs: [goal.id, ...ids]);
+    await db.update(
+      AppDatabase.tasksTable,
+      {'active': 0},
+      where: 'goal_id=? AND id NOT IN (${idsPlaceholders})',
+      whereArgs: [goal.id, ...ids],
+    );
   }
 
   Future updateTask(Task task) async {

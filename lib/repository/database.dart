@@ -36,30 +36,55 @@ class AppDatabaseMigrations {
   void v1up(Database db) async {
     var batch = db.batch();
 
-    batch.execute(
-      '''
+    batch.execute('''
       CREATE TABLE ${AppDatabase.goalsTable}(
-        id INTEGER PRIMARY KEY, 
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        active INTEGER NOT NULL DEFAULT 1, 
         name TEXT,
         type TEXT,
         tool TEXT,
         position INTEGER NOT NULL DEFAULT 0
        )
-      ''',
-    );
+      ''');
 
-    batch.execute(
-      '''
+    batch.execute('''
       CREATE TABLE ${AppDatabase.tasksTable}(
-        id INTEGER PRIMARY KEY,         
+        id INTEGER PRIMARY KEY AUTOINCREMENT,         
+        active INTEGER NOT NULL DEFAULT 1, 
         name TEXT,
         estimation INTEGER,
         repeatable INTEGER NOT NULL DEFAULT 0,
         position INTEGER NOT NULL DEFAULT 0,
-        goal_id INTEGER NOT NULL REFERENCES goals ON DELETE cascade
+        goal_id INTEGER NOT NULL REFERENCES ${AppDatabase.goalsTable}
        )
-      ''',
-    );
+      ''');
+
+    batch.execute('''
+      CREATE TABLE ${AppDatabase.taskStatusTable}(
+        task_id INTEGER PRIMARY KEY REFERENCES ${AppDatabase.tasksTable},
+        status TEXT,
+        started_at INTEGER,
+        last_run_at INTEGER,
+        duration INTEGER,         
+        timebox INTEGER,
+        cooldown INTEGER,
+        notes TEXT
+       )
+      ''');
+
+    batch.execute('''
+      CREATE TABLE ${AppDatabase.taskHistoryTable}(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id INTEGER REFERENCES ${AppDatabase.tasksTable},
+        status TEXT,
+        started_at INTEGER,
+        last_run_at INTEGER,
+        duration INTEGER,         
+        timebox INTEGER,
+        cooldown INTEGER,
+        notes TEXT
+       )
+      ''');
 
     await batch.commit(noResult: true);
   }
@@ -116,6 +141,9 @@ class AppDatabaseInit {
     final database = await openDatabase(
       dbName,
       onCreate: (db, version) => _migrate(db, version),
+      onConfigure: (db) async {
+        await db.execute("PRAGMA foreign_keys = ON");
+      },
       version: 1,
     );
 
@@ -136,10 +164,11 @@ class AppDatabaseInit {
   }
 }
 
-
 class AppDatabase {
   static const goalsTable = 'goals';
   static const tasksTable = 'tasks';
+  static const taskStatusTable = 'task_status';
+  static const taskHistoryTable = 'task_history';
 
   static AppDatabase? _instance;
 
@@ -156,5 +185,4 @@ class AppDatabase {
   static AppDatabase get instance => _instance!;
 
   Database get database => _database;
-
 }
