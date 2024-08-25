@@ -11,10 +11,12 @@ class TaskTile extends StatefulWidget {
     super.key,
     required this.goal,
     required this.task,
+    required this.onDelete,
   });
 
   final Goal goal;
   final Task task;
+  final void Function() onDelete;
 
   @override
   State<TaskTile> createState() => _TaskTileState();
@@ -59,42 +61,29 @@ class _TaskTileState extends State<TaskTile> {
       );
     }
 
-    return ListTile(
-      title: nameField,
-      leading: GestureDetector(
-        child: Icon(widget.task.repeatable ? Icons.repeat_on : Icons.repeat),
-        onTap: () => setState(() {
-          widget.task.repeatable = !widget.task.repeatable;
-          GoalsRepo.instance.updateTask(widget.task);
-        }),
+    return  Dismissible(
+      key: Key(widget.goal.id!.toString()),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        widget.onDelete();
+      },
+      background: Container(
+        color: Colors.redAccent,
+        alignment: AlignmentDirectional.centerEnd,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Icon(Icons.delete_forever),
+        ),
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GestureDetector(
-            child: Icon(Icons.delete),
-            onTap: () => showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: const Text('Task deletion'),
-                content: Text(
-                    'Are you sure you want to want to delete task ${widget.task.name}?'),
-                actions: <Widget>[
-                  TextButton(
-                      onPressed: () => setState(() {
-                            widget.goal.tasks.remove(widget.task);
-                            GoalsRepo.instance.updateTasks(widget.goal);
-                            Navigator.pop(context, 'Delete');
-                          }),
-                      child: const Text('Delete')),
-                  TextButton(
-                      onPressed: () => Navigator.pop(context, 'No'),
-                      child: const Text('No')),
-                ],
-              ),
-            ),
-          ),
-        ],
+      child: ListTile(
+        title: nameField,
+        leading: GestureDetector(
+          child: Icon(widget.task.repeatable ? Icons.repeat_on : Icons.repeat),
+          onTap: () => setState(() {
+            widget.task.repeatable = !widget.task.repeatable;
+            GoalsRepo.instance.updateTask(widget.task);
+          }),
+        ),
       ),
     );
   }

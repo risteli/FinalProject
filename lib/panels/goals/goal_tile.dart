@@ -1,17 +1,21 @@
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
-import '../../widgets/check_button.dart';
 
 class GoalTile extends StatefulWidget {
   const GoalTile({
     super.key,
     required this.goal,
-    this.isSelected = false,
-    this.onSelected,
+    required this.isSelected,
+    required this.onSelected,
+    required this.onDelete,
   });
 
   final bool isSelected;
-  final void Function()? onSelected;
+  final void Function() onSelected;
+  final void Function() onDelete;
   final Goal goal;
 
   @override
@@ -32,7 +36,21 @@ class _GoalTileState extends State<GoalTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Dismissible(
+      key: Key(widget.goal.id!.toString()),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        widget.onDelete();
+      },
+      background: Container(
+        color: Colors.redAccent,
+        alignment: AlignmentDirectional.centerEnd,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Icon(Icons.delete_forever),
+        ),
+      ),
+      child: Card(
         elevation: 0,
         color: _surfaceColor,
         clipBehavior: Clip.hardEdge,
@@ -46,6 +64,7 @@ class _GoalTileState extends State<GoalTile> {
             ),
           ],
         ),
+      ),
     );
   }
 }

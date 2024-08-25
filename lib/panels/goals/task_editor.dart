@@ -45,6 +45,14 @@ class _TaskListState extends State<TaskList> {
               key: Key('task-${task.id}'),
               goal: widget.goal,
               task: task,
+              onDelete: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Task "${task.name}" dismissed')));
+                setState(() {
+                  widget.goal.tasks.remove(task);
+                  GoalsRepo.instance.updateTasks(widget.goal);
+                });
+              },
             ),
           TextField(
             key: const Key('task-new'),

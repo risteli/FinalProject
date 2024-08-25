@@ -32,6 +32,11 @@ class GoalsModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void delete(int index) {
+    _items.removeAt(index);
+    notifyListeners();
+  }
+
   void move(int oldIndex, int newIndex) {
     _items.insert(newIndex, _items.removeAt(oldIndex));
     notifyListeners();
