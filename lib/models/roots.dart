@@ -42,6 +42,10 @@ class GoalsModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Goal findById(int? goalId) {
+    return _items.firstWhere((element) => element.id == goalId);
+  }
+
   void clear() {
     _items.clear();
     notifyListeners();

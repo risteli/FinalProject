@@ -6,11 +6,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../models/roots.dart';
+import '../../routes.dart';
 import '../../widgets/app_panels.dart';
 import 'browser.dart';
-
-const routeEditGoals = '/';
-const routeCreateGoal = '/create-goal';
 
 class GoalsPanel extends StatelessWidget {
   const GoalsPanel({

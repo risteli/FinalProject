@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:final_project/panels/goals/panel.dart';
 import 'package:final_project/panels/goals/loader.dart';
 import 'package:final_project/panels/goals/runner.dart';
+import 'package:final_project/routes.dart';
 import 'package:flutter/material.dart';
 
 import 'destinations.dart';

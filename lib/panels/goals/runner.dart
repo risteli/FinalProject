@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:final_project/panels/goals/runner_goals.dart';
 import 'package:final_project/panels/goals/runner_tasks.dart';
+import 'package:final_project/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -20,16 +21,15 @@ class RunnerPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goalsModel = Provider.of<GoalsModel>(context);
-
-    log('navigation key ${navigationStateKey}');
     return Navigator(
       key: navigationStateKey,
       onGenerateRoute: (RouteSettings settings) {
         log('route changed ${settings.name}');
 
         final page = switch (settings.name) {
-          '/' => _RunnableGoals(),
+          routeShowRunnables =>
+            _RunnableGoals(navigationStateKey: navigationStateKey),
+        routeRunTask => RunTask(),
           _ => throw StateError('Invalid route: ${settings.name}'),
         };
 
@@ -45,7 +45,10 @@ class RunnerPanel extends StatelessWidget {
 class _RunnableGoals extends StatefulWidget {
   const _RunnableGoals({
     super.key,
+    required this.navigationStateKey,
   });
+
+  final GlobalKey<NavigatorState> navigationStateKey;
 
   @override
   State<_RunnableGoals> createState() => _RunnableGoalsState();
@@ -59,37 +62,73 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
     log('building RunnableGoalsState');
 
     return Consumer<GoalsModel>(
-      builder: (context, goalsModel, _) => AppPanels(
-        singleLayout: GoalsRunnerGoals(
-          goalsModel: goalsModel,
-          selectedIndex: selectedIndex,
-          onSelected: (context, newSelectedIndex) {
-            setState(() {
-              selectedIndex = newSelectedIndex;
-              log('selected $selectedIndex');
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    GoalsRunnerTasks(goal: goalsModel.items[selectedIndex!]),
-              ),
-            );
-          },
-        ),
-        doubleLayoutLeft: GoalsRunnerGoals(
-          goalsModel: goalsModel,
-          selectedIndex: selectedIndex,
-          onSelected: (context, newSelectedIndex) {
-            setState(() {
-              selectedIndex = newSelectedIndex;
-              log('selected $selectedIndex');
-            });
-          },
-        ),
-        doubleLayoutRight: GoalsRunnerTasks(
-          goal: goalsModel.items[selectedIndex!],
-        ),
+      builder: (context, goalsModel, _) {
+        routeToRunner(task) => widget.navigationStateKey.currentState!
+            .pushNamed(routeRunTask, arguments: task);
+
+        return AppPanels(
+          singleLayout: GoalsRunnerGoals(
+            goalsModel: goalsModel,
+            selectedIndex: selectedIndex,
+            onSelected: (context, newSelectedIndex) {
+              setState(() {
+                selectedIndex = newSelectedIndex;
+                log('selected $selectedIndex');
+              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) {
+                    return GoalsRunnerTasks(
+                      goal: goalsModel.items[newSelectedIndex!],
+                      onSelected: routeToRunner,
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          doubleLayoutLeft: GoalsRunnerGoals(
+            goalsModel: goalsModel,
+            selectedIndex: selectedIndex,
+            onSelected: (context, newSelectedIndex) {
+              setState(() {
+                selectedIndex = newSelectedIndex;
+                log('selected $selectedIndex');
+              });
+            },
+          ),
+          doubleLayoutRight: GoalsRunnerTasks(
+            goal: goalsModel.items[selectedIndex!],
+            onSelected: routeToRunner,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class RunTask extends StatelessWidget {
+  const RunTask({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final goalsModel = Provider.of<GoalsModel>(context);
+
+    final task = ModalRoute.of(context)!.settings.arguments as Task;
+    final goal = goalsModel.findById(task.goalId);
+
+    log('run task $task');
+    return Card(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text("Goal: ${goal.name}"),
+          Text("Task: ${task.name}"),
+        ],
       ),
     );
   }

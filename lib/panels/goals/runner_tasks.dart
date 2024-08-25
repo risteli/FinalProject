@@ -13,9 +13,11 @@ class GoalsRunnerTasks extends StatefulWidget {
   const GoalsRunnerTasks({
     super.key,
     required this.goal,
+    required this.onSelected,
   });
 
   final Goal goal;
+  final Function(Task) onSelected;
 
   @override
   State<GoalsRunnerTasks> createState() => _GoalsRunnerTasksState();
@@ -36,7 +38,7 @@ class _GoalsRunnerTasksState extends State<GoalsRunnerTasks> {
           children: [
             GoalsRunnerTasksList(
               goal: widget.goal,
-              onSelected: (task) => log('selected task $task'),
+              onSelected: widget.onSelected,
             ),
           ],
         ),
