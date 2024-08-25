@@ -21,6 +21,7 @@ class _AppState extends State<App> {
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _backgroundColor = Color.alphaBlend(
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
+  int currentIndex = 0;
   final navigatorStateKey = GlobalKey<NavigatorState>();
 
   @override
@@ -32,13 +33,10 @@ class _AppState extends State<App> {
         children: [
           if (doubleRail)
             AppNavigationRail(
-              selectedIndex: 0,
+              selectedIndex: currentIndex,
               backgroundColor: _backgroundColor,
-              onDestinationSelected: (index) {
-                setState(() {
-                  log('selecting navigation $index');
-                });
-              },
+              onDestinationSelected: (index) =>
+                  setState(() => currentIndex = index),
               onCreateButtonPressed: () =>
                   navigatorStateKey.currentState!.pushNamed('/create-task'),
             ),
@@ -46,11 +44,14 @@ class _AppState extends State<App> {
             child: Container(
               // this should be replaced by navigation!
               color: _backgroundColor,
-              child: GoalsAsyncLoader(
-                child: GoalsPanel(
-                  navigationStateKey: navigatorStateKey,
-                ),
-              ),
+              child: switch (currentIndex) {
+                0 => GoalsAsyncLoader(
+                    child: GoalsPanel(
+                      navigationStateKey: navigatorStateKey,
+                    ),
+                  ),
+                _ => Text('invalid page'),
+              },
             ),
           ),
         ],
@@ -65,12 +66,9 @@ class _AppState extends State<App> {
       bottomNavigationBar: doubleRail
           ? null
           : AppBottomNavigationBar(
-              selectedIndex: 0,
-              onDestinationSelected: (index) {
-                setState(() {
-                  log('selecting navigation $index');
-                });
-              },
+              selectedIndex: currentIndex,
+              onDestinationSelected: (index) =>
+                  setState(() => currentIndex = index),
             ),
     );
   }

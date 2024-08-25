@@ -32,7 +32,7 @@ class GoalsAsyncLoader extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
+                    child: Text('Error on loading db: ${snapshot.error}'),
                   ),
                 ],
               ),
@@ -50,11 +50,8 @@ class GoalsAsyncLoader extends StatelessWidget {
             );
           }
 
-          return ChangeNotifierProvider<GoalsModel>(
-            create: (_) {
-              log('CNP goals model');
-              return GoalsRepo.instance.goals;
-            },
+          return ChangeNotifierProvider<GoalsModel>.value(
+            value: GoalsRepo.instance.goals,
             child: child,
           );
         });
