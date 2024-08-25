@@ -28,7 +28,7 @@ class GoalsRepo {
     log('goalsrepo load called');
 
     var rawGoals = await db.query(
-      'goals',
+      AppDatabase.goalsTable,
       where: 'active=1',
       orderBy: 'position',
     );
@@ -44,16 +44,42 @@ class GoalsRepo {
     }
 
     var rawTasks = await db.query(
-      'tasks',
+      AppDatabase.tasksTable,
       where: 'active=1 AND goal_id IN (SELECT id FROM goals WHERE active=1)',
       orderBy: 'position',
     );
 
+    var taskIds = <int>[];
     for (var rawTask in rawTasks) {
       var task = Task.fromMap(rawTask);
+      taskIds.add(task.id!);
       goalById[task.goalId!]!.tasks.add(task);
     }
     goals.load(loadedGoals);
+
+    if (taskIds.isNotEmpty) {
+      var records = await db.query(
+        AppDatabase.taskStatusTable,
+        where: 'task_id IN (?)',
+        whereArgs: [List.filled(taskIds.length, '?').join(',')],
+      );
+
+      var taskStatusByTask = <int, TaskStatus>{};
+      for (var record in records) {
+        var taskStatus = TaskStatus.fromMap(record);
+        taskStatusByTask[taskStatus.taskId] = taskStatus;
+      }
+
+      for (var goal in goals.items) {
+        for (var task in goal.tasks) {
+          if (taskStatusByTask.containsKey(task.id!)) {
+            task.status = taskStatusByTask[task.id!];
+          } else {
+            task.status = TaskStatus(taskId: task.id!);
+          }
+        }
+      }
+    }
 
     return goals;
   }
@@ -160,5 +186,11 @@ class GoalsRepo {
     log('now creating $task ${task.toMap()}');
     task.id = await db.insert(AppDatabase.tasksTable, task.toMap());
     log('created $task');
+  }
+
+  Future updateTaskStatus(TaskStatus taskStatus) async {
+    log('now updating $taskStatus ${taskStatus.toMap()}');
+    await db.update(AppDatabase.taskStatusTable, taskStatus.toMap(),
+        where: 'task_id=?', whereArgs: [taskStatus.taskId]);
   }
 }

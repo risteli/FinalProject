@@ -86,6 +86,7 @@ class Task {
   Duration? estimation;
   int position = 0;
   bool repeatable = false;
+  TaskStatus? status;
 
   Map<String, Object?> toMap() {
     return {
@@ -135,4 +136,60 @@ class StopwatchTool implements Tool {
 
   @override
   ToolType get toolType => ToolType.stopwatch;
+}
+
+enum TaskStatusValue {
+  ready(value: "ready"),
+  started(value: "started"),
+  stopped(value: "stopped"),
+  done(value: "done");
+
+  const TaskStatusValue({required this.value});
+
+  final String value;
+}
+
+class TaskStatus {
+  TaskStatus({
+    required this.taskId,
+  });
+
+  late final int taskId;
+  TaskStatusValue status = TaskStatusValue.ready;
+  DateTime? startedAt;
+  DateTime? lastRunAt;
+  Duration? duration;
+  Duration? timebox;
+  Duration? cooldown;
+
+  Map<String, Object?> toMap() {
+    return {
+      'task_id': taskId,
+      'status': status.value,
+      'started_at': startedAt?.millisecondsSinceEpoch,
+      'last_run_at': lastRunAt?.millisecondsSinceEpoch,
+      'duration': duration?.inSeconds,
+      'timebox': timebox?.inSeconds,
+      'cooldown': cooldown?.inSeconds,
+    };
+  }
+
+  TaskStatus.fromMap(Map<String, Object?> map) {
+    taskId = map['task_id'] as int;
+
+    status = map['status'] == null
+        ? TaskStatusValue.ready
+        : TaskStatusValue.values.byName(map['status'] as String);
+
+    startedAt = map['started_at'] == null ? null: DateTime.fromMillisecondsSinceEpoch(map['started_at'] as int);
+    lastRunAt = map['last_run_at'] == null ? null: DateTime.fromMillisecondsSinceEpoch(map['last_run_at'] as int);
+    duration = map['duration'] == null ? null: Duration(seconds: map['duration'] as int);
+    timebox = map['timebox'] == null ? null: Duration(seconds: map['timebox'] as int);
+    cooldown = map['cooldown'] == null ? null: Duration(seconds: map['cooldown'] as int);
+  }
+
+  @override
+  String toString() {
+    return "TaskStatus(task_id=$taskId, status=$status)";
+  }
 }
