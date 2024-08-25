@@ -6,10 +6,12 @@ class AppBottomNavigationBar extends StatelessWidget {
   const AppBottomNavigationBar({
     super.key,
     required this.selectedIndex,
+    required this.destinations,
     this.onDestinationSelected,
   });
 
   final int selectedIndex;
+  final List<Destination> destinations;
   final ValueChanged<int>? onDestinationSelected;
 
   @override
@@ -28,5 +30,3 @@ class AppBottomNavigationBar extends StatelessWidget {
     );
   }
 }
-
-

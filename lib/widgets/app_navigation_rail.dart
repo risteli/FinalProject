@@ -6,12 +6,14 @@ import 'app_floating_action_button.dart'; // Add this import
 class AppNavigationRail extends StatefulWidget {
   const AppNavigationRail({
     super.key,
+    required this.destinations,
     required this.backgroundColor,
     required this.selectedIndex,
     this.onDestinationSelected,
     this.onCreateButtonPressed,
   });
 
+  final List<Destination> destinations;
   final Color backgroundColor;
   final int selectedIndex;
   final ValueChanged<int>? onDestinationSelected;
@@ -40,7 +42,7 @@ class _AppNavigationRailState extends State<AppNavigationRail> {
         ],
       ),
       groupAlignment: -0.8,
-      destinations: destinations.map((d) {
+      destinations: widget.destinations.map((d) {
         return NavigationRailDestination(
           icon: Icon(d.icon),
           label: Text(d.label),
