@@ -20,18 +20,19 @@ class GoalsAsyncLoader extends StatelessWidget {
         future: GoalsRepo.instance.load(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasError) {
-            return Center(
+            log('error while loading data on GoalsAsyncLoader: ${snapshot.error}');
+            return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
                     color: Colors.red,
                     size: 60,
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error on loading db: ${snapshot.error}'),
+                    padding: EdgeInsets.only(top: 16),
+                    child: Text('Error while loading the data.'),
                   ),
                 ],
               ),

@@ -37,7 +37,6 @@ class GoalsRepo {
 
     List<Goal> loadedGoals = [];
 
-    log('now loading rawGoals');
     for (var rawGoal in rawGoals) {
       var goal = Goal.fromMap(rawGoal);
       loadedGoals.add(goal);
@@ -50,18 +49,12 @@ class GoalsRepo {
       orderBy: 'position',
     );
 
-    log('now loading rawTasks');
     for (var rawTask in rawTasks) {
       var task = Task.fromMap(rawTask);
       goalById[task.goalId!]!.tasks.add(task);
     }
-    log('done loading rawTasks');
-
     goals.load(loadedGoals);
-    log('goals now loaded');
 
-
-    log('all set $loadedGoals');
     return goals;
   }
 
