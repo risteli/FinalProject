@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_material_pickers/flutter_material_pickers.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
@@ -18,6 +19,8 @@ class RunTask extends StatefulWidget {
 }
 
 class _RunTaskState extends State<RunTask> {
+  final runController = TaskProgressController();
+
   @override
   Widget build(BuildContext context) {
     final goalsModel = Provider.of<GoalsModel>(context);
@@ -29,17 +32,20 @@ class _RunTaskState extends State<RunTask> {
 
     return RunTaskUI(
       status: task.status!,
+      runController: runController,
       onStart: () {
         setState(() {
           task.status!.status = TaskStatusValue.started;
         });
         log('starting the task, now ${task.status!}');
+        runController.resume();
       },
       onStop: () {
         setState(() {
           task.status!.status = TaskStatusValue.stopped;
         });
         log('stopping the task, now ${task.status!}');
+        runController.pause();
       },
       onDone: () {
         setState(() {
@@ -53,6 +59,11 @@ class _RunTaskState extends State<RunTask> {
         });
         log('restarting the task, now ${task.status!}');
       },
+      onSetDuration: (duration) {
+        setState(() {
+          task.estimation = duration;
+        });
+      },
     );
   }
 }
@@ -60,18 +71,22 @@ class _RunTaskState extends State<RunTask> {
 class RunTaskUI extends StatelessWidget {
   const RunTaskUI({
     super.key,
+    required this.runController,
     required this.status,
     required this.onStart,
     required this.onStop,
     required this.onDone,
     required this.onRestart,
+    required this.onSetDuration,
   });
 
+  final TaskProgressController runController;
   final status;
   final Function() onStart;
   final Function() onStop;
   final Function() onDone;
   final Function() onRestart;
+  final Function(Duration) onSetDuration;
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +94,8 @@ class RunTaskUI extends StatelessWidget {
 
     final task = ModalRoute.of(context)!.settings.arguments as Task;
     final goal = goalsModel.findById(task.goalId);
+
+    Duration duration = task.estimation ?? const Duration(minutes: 25);
 
     log('run task $task');
 
@@ -89,6 +106,15 @@ class RunTaskUI extends StatelessWidget {
         children: [
           _GoalCard(goal: goal),
           _TaskCard(task: task),
+          SizedBox(
+            height: 200,
+            width: 200,
+            child: TaskProgress(
+              duration: duration,
+              controller: runController,
+              onSetDuration: onSetDuration,
+            ),
+          ),
           if (task.status!.status != TaskStatusValue.done) ...[
             _StartStopCard(task: task, onStart: onStart, onStop: onStop),
             _DoneCard(task: task, onDone: onDone),
@@ -378,4 +404,136 @@ class _CompletedCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// based on https://github.com/AndresR173/countdown_progress_indicator/blob/main/lib/countdown_progress_indicator.dart
+
+class TaskProgress extends StatefulWidget {
+  const TaskProgress({
+    super.key,
+    required this.duration,
+    required this.controller,
+    required this.onSetDuration,
+  });
+
+  final Duration duration;
+  final TaskProgressController controller;
+  final Function(Duration) onSetDuration;
+
+  @override
+  State<TaskProgress> createState() =>
+      _TaskProgressState();
+}
+
+class _TaskProgressState extends State<TaskProgress>
+    with SingleTickerProviderStateMixin {
+  late Animation<double> _animation;
+  late AnimationController _animationController;
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: widget.duration.inSeconds.toDouble(),
+    ).animate(_animationController);
+
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        log('completed');
+      }
+    });
+
+    _animationController.addListener(() {
+      setState(() {});
+    });
+
+    widget.controller?._state = this;
+  }
+
+  @override
+  void reassemble() {
+    onAnimationStart();
+    super.reassemble();
+  }
+
+  void onAnimationStart() {
+    _animationController.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Stack(
+        children: [
+          SizedBox(
+            height: double.infinity,
+            width: double.infinity,
+            child: CircularProgressIndicator(
+              strokeWidth: 12.0,
+              value: _animation.value / widget.duration.inSeconds,
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      showMaterialNumberPicker(
+                          context: context,
+                          title:
+                              'How many minutes do you want to run this task?',
+                          step: 5,
+                          minNumber: 5,
+                          maxNumber: 100,
+                          selectedNumber: widget.duration.inMinutes,
+                          onChanged: (newDuration) => widget.onSetDuration(Duration(minutes: newDuration)),
+                      );
+                    },
+                    child: Text(
+                      Duration(
+                              seconds:
+                                  widget.duration.inSeconds - _animation.value.toInt())
+                          .toString()
+                          .split('.')[0],
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _animationController.forward(from: 0.0),
+                    child: const Icon(Icons.restart_alt),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TaskProgressController {
+  late _TaskProgressState _state;
+
+  void pause() => _state._animationController.stop(canceled: false);
+
+  void resume() => _state._animationController.forward();
 }
