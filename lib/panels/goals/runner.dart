@@ -33,37 +33,39 @@ class _RunTaskState extends State<RunTask> {
     return RunTaskUI(
       status: task.status!,
       runController: runController,
-      onStart: () {
-        setState(() {
-          task.status!.status = TaskStatusValue.started;
-        });
-        log('starting the task, now ${task.status!}');
-        runController.resume();
-      },
-      onStop: () {
-        setState(() {
-          task.status!.status = TaskStatusValue.stopped;
-        });
-        log('stopping the task, now ${task.status!}');
-        runController.pause();
-      },
-      onDone: () {
-        setState(() {
-          task.status!.status = TaskStatusValue.done;
-        });
-        log('completing the task, now ${task.status!}');
-      },
-      onRestart: () {
-        setState(() {
-          task.status!.status = TaskStatusValue.ready;
-        });
-        log('restarting the task, now ${task.status!}');
-      },
-      onSetDuration: (duration) {
-        setState(() {
-          task.estimation = duration;
-        });
-      },
+      runTaskController: RunTaskUIController(
+        onStart: () {
+          setState(() {
+            task.status!.status = TaskStatusValue.started;
+          });
+          log('starting the task, now ${task.status!}');
+          runController.resume();
+        },
+        onStop: () {
+          setState(() {
+            task.status!.status = TaskStatusValue.stopped;
+          });
+          log('stopping the task, now ${task.status!}');
+          runController.pause();
+        },
+        onDone: () {
+          setState(() {
+            task.status!.status = TaskStatusValue.done;
+          });
+          log('completing the task, now ${task.status!}');
+        },
+        onRestart: () {
+          setState(() {
+            task.status!.status = TaskStatusValue.ready;
+          });
+          log('restarting the task, now ${task.status!}');
+        },
+        onSetDuration: (duration) {
+          setState(() {
+            task.estimation = duration;
+          });
+        },
+      ),
     );
   }
 }
@@ -71,22 +73,14 @@ class _RunTaskState extends State<RunTask> {
 class RunTaskUI extends StatelessWidget {
   const RunTaskUI({
     super.key,
+    required this.runTaskController,
     required this.runController,
     required this.status,
-    required this.onStart,
-    required this.onStop,
-    required this.onDone,
-    required this.onRestart,
-    required this.onSetDuration,
   });
 
   final TaskProgressController runController;
   final status;
-  final Function() onStart;
-  final Function() onStop;
-  final Function() onDone;
-  final Function() onRestart;
-  final Function(Duration) onSetDuration;
+  final RunTaskUIController runTaskController;
 
   @override
   Widget build(BuildContext context) {
@@ -97,88 +91,83 @@ class RunTaskUI extends StatelessWidget {
 
     Duration duration = task.estimation ?? const Duration(minutes: 25);
 
-    log('run task $task');
-
     return Card(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _GoalCard(goal: goal),
-          _TaskCard(task: task),
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: TaskProgress(
-              duration: duration,
-              controller: runController,
-              onSetDuration: onSetDuration,
+          Expanded(
+            flex: 1,
+            child: _InfoCard(
+              goal: goal,
+              task: task,
             ),
           ),
-          if (task.status!.status != TaskStatusValue.done) ...[
-            _StartStopCard(task: task, onStart: onStart, onStop: onStop),
-            _DoneCard(task: task, onDone: onDone),
-          ] else if (task.repeatable)
-            _RestartCard(task: task, onRestart: onRestart)
-          else
-            _CompletedCard()
+          Expanded(
+            flex: 3,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TaskProgress(
+                      duration: duration,
+                      controller: runController,
+                      onSetDuration: runTaskController.onSetDuration,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (task.status!.status != TaskStatusValue.done) ...[
+                          _StartStopCard(
+                              task: task,
+                              onStart: runTaskController.onStart,
+                              onStop: runTaskController.onStop),
+                          _DoneCard(task: task, onDone: runTaskController.onDone),
+                        ] else if (task.repeatable)
+                          _RestartCard(
+                              task: task, onRestart: runTaskController.onRestart)
+                        else
+                          const _CompletedCard()
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _GoalCard extends StatelessWidget {
-  const _GoalCard({required this.goal});
+class RunTaskUIController {
+  const RunTaskUIController({
+    required this.onStart,
+    required this.onStop,
+    required this.onDone,
+    required this.onRestart,
+    required this.onSetDuration,
+  });
 
-  final Goal goal;
-
-  @override
-  Widget build(BuildContext context) {
-    late final colorScheme = Theme.of(context).colorScheme;
-    late final backgroundColor = Color.alphaBlend(
-        colorScheme.secondary.withOpacity(0.14), colorScheme.surface);
-    late final textStyle = TextStyle(color: colorScheme.secondary);
-
-    return Card(
-      color: backgroundColor,
-      child: SizedBox(
-        width: 200,
-        height: 100,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const SizedBox(width: 8),
-              Icon(goal.goalType?.icon),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Your goal'),
-                    const SizedBox(height: 8),
-                    Text(
-                      goal.name,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 3,
-                      style: textStyle,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  final Function() onStart;
+  final Function() onStop;
+  final Function() onDone;
+  final Function() onRestart;
+  final Function(Duration) onSetDuration;
 }
 
-class _TaskCard extends StatelessWidget {
-  const _TaskCard({required this.task});
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.goal, required this.task});
 
+  final Goal goal;
   final Task task;
 
   @override
@@ -186,28 +175,41 @@ class _TaskCard extends StatelessWidget {
     late final colorScheme = Theme.of(context).colorScheme;
     late final backgroundColor = Color.alphaBlend(
         colorScheme.secondary.withOpacity(0.14), colorScheme.surface);
-    late final textStyle = TextStyle(color: colorScheme.secondary);
 
     return Card(
       color: backgroundColor,
       child: SizedBox(
-        width: 200,
-        height: 100,
+        width: double.infinity,
+        height: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
+              const SizedBox(width: 8),
+              Icon(
+                goal.goalType?.icon,
+                size: 80.0,
+              ),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Task to complete'),
+                    Text(
+                      goal.name,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      style: TextStyle(
+                          color: colorScheme.secondary, fontSize: 20.0),
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       task.name,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
-                      style: textStyle,
+                      style: TextStyle(
+                          color: colorScheme.secondary, fontSize: 16.0),
                     ),
                   ],
                 ),
@@ -421,14 +423,18 @@ class TaskProgress extends StatefulWidget {
   final Function(Duration) onSetDuration;
 
   @override
-  State<TaskProgress> createState() =>
-      _TaskProgressState();
+  State<TaskProgress> createState() => _TaskProgressState();
 }
 
 class _TaskProgressState extends State<TaskProgress>
     with SingleTickerProviderStateMixin {
   late Animation<double> _animation;
   late AnimationController _animationController;
+
+  late final _colorScheme = Theme.of(context).colorScheme;
+  late final _progressValueColor = _colorScheme.secondary;
+  late final _progressBackgroundColor = Color.alphaBlend(
+      _colorScheme.primary.withOpacity(0.30), _colorScheme.surface);
 
   @override
   void dispose() {
@@ -482,6 +488,8 @@ class _TaskProgressState extends State<TaskProgress>
             width: double.infinity,
             child: CircularProgressIndicator(
               strokeWidth: 12.0,
+              valueColor: AlwaysStoppedAnimation<Color>(_progressValueColor),
+              backgroundColor: _progressBackgroundColor,
               value: _animation.value / widget.duration.inSeconds,
             ),
           ),
@@ -494,20 +502,20 @@ class _TaskProgressState extends State<TaskProgress>
                   GestureDetector(
                     onTap: () {
                       showMaterialNumberPicker(
-                          context: context,
-                          title:
-                              'How many minutes do you want to run this task?',
-                          step: 5,
-                          minNumber: 5,
-                          maxNumber: 100,
-                          selectedNumber: widget.duration.inMinutes,
-                          onChanged: (newDuration) => widget.onSetDuration(Duration(minutes: newDuration)),
+                        context: context,
+                        title: 'How many minutes do you want to run this task?',
+                        step: 5,
+                        minNumber: 5,
+                        maxNumber: 100,
+                        selectedNumber: widget.duration.inMinutes,
+                        onChanged: (newDuration) => widget
+                            .onSetDuration(Duration(minutes: newDuration)),
                       );
                     },
                     child: Text(
                       Duration(
-                              seconds:
-                                  widget.duration.inSeconds - _animation.value.toInt())
+                              seconds: widget.duration.inSeconds -
+                                  _animation.value.toInt())
                           .toString()
                           .split('.')[0],
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
