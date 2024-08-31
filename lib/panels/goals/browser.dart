@@ -40,7 +40,7 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
           GoalBrowserList(
             storageRoot: widget.storageRoot,
             onSelected: widget.onSelected,
-            onUpdatedGoals: () => storage.updateGoals(widget.storageRoot),
+            onUpdatedGoals: () => storage.updateGoals(),
             selectedIndex: widget.selectedIndex,
           ),
         ],

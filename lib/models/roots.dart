@@ -27,7 +27,7 @@ class StorageRoot extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateGoal(int index, Goal value) {
+  void updateGoalAt(int index, Goal value) {
     _goals[index] = value;
     notifyListeners();
   }

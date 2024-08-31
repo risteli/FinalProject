@@ -82,34 +82,12 @@ class Storage {
     return root;
   }
 
-  Future create(Goal goal) async {
-    if (root.goals.isNotEmpty) {
-      goal.position = root.goals
-              .reduce((v, e) => e.position > v.position ? e : v)
-              .position +
-          1;
-    }
-
-    log('now creating $goal ${goal.toMap()}');
-
-    goal.id = await db.insert(AppDatabase.goalsTable, goal.toMap());
-
-    log('created $goal');
-  }
-
-  Future update(Goal goal) async {
-    log('now updating $goal ${goal.toMap()}');
-
-    await db.update(AppDatabase.goalsTable, goal.toMap(),
-        where: 'id=?', whereArgs: [goal.id]);
-  }
-
-  Future updateGoals(StorageRoot goals) async {
-    log('now updating $goals');
+  Future updateGoals() async {
+    log('now updating');
 
     var batch = db.batch();
-    for (var i = 0; i < goals.goals.length; i++) {
-      var goal = goals.goals[i];
+    for (var i = 0; i < root.goals.length; i++) {
+      var goal = root.goals[i];
       goal.position = i;
 
       var record = goal.toMap();
@@ -124,8 +102,8 @@ class Storage {
     var ids = await batch.commit();
 
     if (true) // TODO REMOVE THIS
-      for (var i = 0; i < goals.goals.length; i++) {
-        log('id of $i is ${ids[i]} and was ${goals.goals[i].id}');
+      for (var i = 0; i < root.goals.length; i++) {
+        log('id of $i is ${ids[i]} and was ${root.goals[i].id}');
       }
 
     var idsPlaceholders = List.filled(ids.length, '?').join(',');

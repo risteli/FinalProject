@@ -20,8 +20,6 @@ class GoalsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final storageRoot = Provider.of<StorageRoot>(context);
-
     log('navigation key ${navigationStateKey}');
     return Navigator(
       key: navigationStateKey,
@@ -68,8 +66,11 @@ class _EditGoalsState extends State<_EditGoals> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    GoalWizard(goal: storageRoot.goals[selectedIndex!]),
+                builder: (_) => GoalWizard(
+                  storageRoot: storageRoot,
+                  goalIndex: selectedIndex!,
+                  onDone: () => Navigator.pop(context),
+                ),
               ),
             );
           },
@@ -87,7 +88,9 @@ class _EditGoalsState extends State<_EditGoals> {
         doubleLayoutRight: selectedIndex == null
             ? const Card()
             : GoalWizard(
-                goal: storageRoot.goals[selectedIndex!],
+                storageRoot: storageRoot,
+                goalIndex: selectedIndex!,
+                onDone: () => setState(() => selectedIndex = null),
               ),
       ),
     );
@@ -99,14 +102,20 @@ class _CreateGoal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<StorageRoot>(
       builder: (context, storageRoot, _) => AppPanels(
-        singleLayout: GoalWizard(goal: Goal()),
+        singleLayout: GoalWizard(
+          storageRoot: storageRoot,
+          onDone: () => Navigator.pop(context),
+        ),
         doubleLayoutLeft: GoalBrowserView(
           storageRoot: storageRoot,
           onSelected: (context, _) {
             log('ignoring selection');
           },
         ),
-        doubleLayoutRight: GoalWizard(goal: Goal()),
+        doubleLayoutRight: GoalWizard(
+          storageRoot: storageRoot,
+          onDone: () => const Card(),
+        ),
       ),
     );
   }
