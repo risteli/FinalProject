@@ -9,16 +9,18 @@ import '../../models/models.dart';
 import 'task_editor.dart';
 
 class GoalWizard extends StatefulWidget {
-  const GoalWizard({
+  GoalWizard({
     super.key,
     required this.storageRoot,
     this.goalIndex,
     this.appbar = false,
+    this.step = 1,
     required this.onDone,
   });
 
   final StorageRoot storageRoot;
   final int? goalIndex;
+  int step;
   final bool appbar;
   final Function() onDone;
 
@@ -32,15 +34,15 @@ class _GoalWizardState extends State<GoalWizard> {
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  int _step = 1;
-
   @override
   Widget build(BuildContext context) {
-    final goal = widget.goalIndex == null
-        ? Goal()
-        : widget.storageRoot.goals[widget.goalIndex!];
+    if (widget.goalIndex == null) {
+      return const Card();
+    }
 
-    log('GoalWizard ${widget.storageRoot.goals}');
+    final goal = widget.storageRoot.goals[widget.goalIndex!];
+
+    log('GoalWizard ${widget.storageRoot.goals} step ${widget.step}');
 
     void persistGoal() {
       widget.storageRoot.updateGoalAt(widget.goalIndex!, goal);
@@ -50,18 +52,18 @@ class _GoalWizardState extends State<GoalWizard> {
     Widget wizardControls = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        if (_step > 1)
+        if (widget.step > 1)
           ElevatedButton(
-            onPressed: () => setState(() => _step--),
+            onPressed: () => setState(() => widget.step--),
             child: const Text('prev'),
           ),
-        if (_step < 4)
+        if (widget.step < 4)
           ElevatedButton(
-            onPressed: () => setState(() => _step++),
+            onPressed: () => setState(() => widget.step++),
             child: const Text('next'),
             //style: ElevatedButton.styleFrom(backgroundColor: _colorScheme.secondary, textStyle: TextStyle(color: _colorScheme.surface)),
           ),
-        if (_step == 4)
+        if (widget.step == 4)
           ElevatedButton(
             onPressed: () => widget.onDone(),
             child: const Text('done'),
@@ -81,7 +83,7 @@ class _GoalWizardState extends State<GoalWizard> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           child: Form(
             key: _formKey,
-            child: switch (_step) {
+            child: switch (widget.step) {
               1 => GoalSlideName(
                   goal: goal,
                   controls: wizardControls,

@@ -92,7 +92,12 @@ class _GoalsPanelState extends State<GoalsPanel> {
       doubleLayoutRight: GoalWizard(
         storageRoot: storageRoot,
         goalIndex: selectedIndex,
-        onDone: () => setState(() {}),
+        onDone: () => setState(
+              () {
+            selectedIndex = null;
+            log('selected ${selectedIndex}');
+          },
+        ),
       ),
     );
   }
