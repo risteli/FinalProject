@@ -4,6 +4,7 @@ import 'package:final_project/panels/goals/panel.dart';
 import 'package:final_project/panels/goals/loader.dart';
 import 'package:final_project/panels/goals/runner_panel.dart';
 import 'package:final_project/routes.dart';
+import 'package:final_project/top.dart';
 import 'package:flutter/material.dart';
 
 import 'destinations.dart';
@@ -28,13 +29,15 @@ class _AppState extends State<App> {
   final goalsNavigatorStateKey = GlobalKey<NavigatorState>();
   final runnerNavigatorStateKey = GlobalKey<NavigatorState>();
 
+  final topController = TopController();
+
   late final List<Destination> destinations = <Destination>[
     Destination(
       icon: Icons.sports_score_outlined,
       label: 'Goals',
       widget: StorageAsyncLoader(
         child: GoalsPanel(
-          navigationStateKey: goalsNavigatorStateKey,
+          topController: topController,
         ),
       ),
     ),
@@ -71,8 +74,7 @@ class _AppState extends State<App> {
               destinations: destinations,
               onDestinationSelected: (index) =>
                   setState(() => currentIndex = index),
-              onCreateButtonPressed: () => goalsNavigatorStateKey.currentState!
-                  .pushNamed(routeCreateGoal),
+              onCreateButtonPressed: () => topController.create(),
             ),
           Expanded(
             child: Container(
@@ -88,8 +90,7 @@ class _AppState extends State<App> {
       floatingActionButton: doubleRail
           ? null
           : AppFloatingActionButton(
-              onPressed: () => goalsNavigatorStateKey.currentState!
-                  .pushNamed(routeCreateGoal),
+              onPressed: () => topController.create(),
               child: const Icon(Icons.add),
             ),
       bottomNavigationBar: doubleRail

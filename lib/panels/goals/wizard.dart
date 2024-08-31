@@ -13,11 +13,13 @@ class GoalWizard extends StatefulWidget {
     super.key,
     required this.storageRoot,
     this.goalIndex,
+    this.appbar = false,
     required this.onDone,
   });
 
   final StorageRoot storageRoot;
   final int? goalIndex;
+  final bool appbar;
   final Function() onDone;
 
   @override
@@ -34,21 +36,15 @@ class _GoalWizardState extends State<GoalWizard> {
 
   @override
   Widget build(BuildContext context) {
-    final storageRoot = Provider.of<StorageRoot>(context);
     final goal = widget.goalIndex == null
         ? Goal()
-        : storageRoot.goals[widget.goalIndex!];
+        : widget.storageRoot.goals[widget.goalIndex!];
 
-    log('GoalWizard ${storageRoot.goals}');
+    log('GoalWizard ${widget.storageRoot.goals}');
 
     void persistGoal() {
-      if (goal.id == null) {
-        storageRoot.addGoal(goal);
-      } else {
-        storageRoot.updateGoalAt(widget.goalIndex!, goal);
-      }
+      widget.storageRoot.updateGoalAt(widget.goalIndex!, goal);
       Storage.instance.updateGoals();
-      return;
     }
 
     Widget wizardControls = Row(
@@ -75,41 +71,39 @@ class _GoalWizardState extends State<GoalWizard> {
 
     return Scaffold(
       backgroundColor: _backgroundColor,
-      appBar: AppBar(
+      appBar: widget.appbar?AppBar(
         backgroundColor: _backgroundColor,
         title: const Text('Here you can define your goal'),
-      ),
+      ):null,
       body: Card(
         color: _backgroundColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           child: Form(
             key: _formKey,
-            child: Consumer<StorageRoot>(
-              builder: (context, goals, _) => switch (_step) {
-                1 => GoalSlideName(
-                    goal: goal,
-                    controls: wizardControls,
-                    onSubmitted: persistGoal,
-                  ),
-                2 => GoalSlideType(
-                    goal: goal,
-                    controls: wizardControls,
-                    onSubmitted: persistGoal,
-                  ),
-                3 => GoalSlideTool(
-                    goal: goal,
-                    controls: wizardControls,
-                    onSubmitted: persistGoal,
-                  ),
-                4 => GoalSlideTasks(
-                    goal: goal,
-                    controls: wizardControls,
-                    onSubmitted: persistGoal,
-                  ),
-                _ => const Text('invalid state'),
-              },
-            ),
+            child: switch (_step) {
+              1 => GoalSlideName(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: persistGoal,
+                ),
+              2 => GoalSlideType(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: persistGoal,
+                ),
+              3 => GoalSlideTool(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: persistGoal,
+                ),
+              4 => GoalSlideTasks(
+                  goal: goal,
+                  controls: wizardControls,
+                  onSubmitted: persistGoal,
+                ),
+              _ => const Text('invalid state'),
+            },
           ),
         ),
       ),
