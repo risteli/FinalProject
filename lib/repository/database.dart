@@ -86,6 +86,20 @@ class AppDatabaseMigrations {
        )
       ''');
 
+    batch.execute('''
+      CREATE TABLE ${AppDatabase.configTable}(
+        key TEXT NOT NULL PRIMARY KEY,
+        value TEXT
+       )
+      ''');
+
+    batch.execute('''
+      INSERT INTO ${AppDatabase.configTable}(key, value)
+      VALUES
+        ('default_timebox', 25),
+        ('default_cooldown', 5);
+      ''');
+
     await batch.commit(noResult: true);
   }
 
@@ -134,7 +148,7 @@ class AppDatabaseInit {
   static Future<AppDatabase> init() async {
     String dbName = join(await getDatabasesPath(), 'taskchisel.db');
 
-    if (false) // enable to drop the db and rebuild it
+    if (true) // enable to drop the db and rebuild it
       await databaseExists(dbName)
           .then((exists) => exists ? deleteDatabase(dbName) : null);
 
@@ -169,6 +183,7 @@ class AppDatabase {
   static const tasksTable = 'tasks';
   static const taskStatusTable = 'task_status';
   static const taskHistoryTable = 'task_history';
+  static const configTable = 'config';
 
   static AppDatabase? _instance;
 

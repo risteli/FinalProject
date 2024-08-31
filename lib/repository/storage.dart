@@ -25,6 +25,16 @@ class Storage {
   static Storage get instance => _instance!;
 
   Future<StorageRoot> load() async {
+    var configKV = await db.query(
+      AppDatabase.configTable,
+    );
+
+    Map<String,String> configMap = {};
+    for (var record in configKV) {
+      configMap[record['key'] as String] = record['value'] as String;
+    }
+    root.setConfig(configMap);
+
     var rawGoals = await db.query(
       AppDatabase.goalsTable,
       where: 'active=1',

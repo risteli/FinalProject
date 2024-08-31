@@ -35,36 +35,44 @@ class _RunTaskState extends State<RunTask> {
 
   @override
   Widget build(BuildContext context) {
-    log('run task $widget.task ${widget.task.status}');
+    final storageRoot = Provider.of<StorageRoot>(context);
+
+    var taskStatus = widget.task.status!;
+
+    taskStatus.timebox ??= storageRoot.config.defaultTimebox;
+    taskStatus.cooldown ??= storageRoot.config.defaultCooldown;
 
     return RunTaskUI(
       runController: runController,
       runTaskController: RunTaskUIController(
         onStart: () {
           setState(() {
-            widget.task.status!.status = TaskStatusValue.started;
+            taskStatus.status = TaskStatusValue.started;
+            taskStatus.startedAt ??= DateTime.now();
+            taskStatus.lastRunAt = DateTime.now();
+            taskStatus.duration ??= const Duration();
           });
-          log('starting the task, now ${widget.task.status!}');
+          log('starting the task, now ${taskStatus}');
           runController.resume();
         },
         onStop: () {
           setState(() {
-            widget.task.status!.status = TaskStatusValue.stopped;
+            taskStatus!.status = TaskStatusValue.stopped;
           });
-          log('stopping the task, now ${widget.task.status!}');
+          log('stopping the task, now ${taskStatus}');
           runController.pause();
         },
         onDone: () {
           setState(() {
-            widget.task.status!.status = TaskStatusValue.done;
+            taskStatus!.status = TaskStatusValue.done;
           });
-          log('completing the task, now ${widget.task.status!}');
+          log('completing the task, now ${taskStatus!}');
         },
         onRestart: () {
           setState(() {
-            widget.task.status!.status = TaskStatusValue.ready;
+            taskStatus!.status = TaskStatusValue.ready;
           });
-          log('restarting the task, now ${widget.task.status!}');
+          log('restarting the task, now ${taskStatus!}');
         },
         onSetDuration: (duration) {
           setState(() {
@@ -492,58 +500,61 @@ class _TaskProgressState extends State<TaskProgress>
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Stack(
-        children: [
-          SizedBox(
-            height: double.infinity,
-            width: double.infinity,
-            child: CircularProgressIndicator(
-              strokeWidth: 24.0,
-              valueColor: AlwaysStoppedAnimation<Color>(_progressValueColor),
-              backgroundColor: _progressBackgroundColor,
-              value: _animation.value / widget.duration.inSeconds,
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      showMaterialNumberPicker(
-                        context: context,
-                        title: 'How many minutes do you want to run this task?',
-                        step: 5,
-                        minNumber: 5,
-                        maxNumber: 100,
-                        selectedNumber: widget.duration.inMinutes,
-                        onChanged: (newDuration) => widget
-                            .onSetDuration(Duration(minutes: newDuration)),
-                      );
-                    },
-                    child: Text(
-                      Duration(
-                              seconds: widget.duration.inSeconds -
-                                  _animation.value.toInt())
-                          .toString()
-                          .split('.')[0],
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Colors.black,
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _animationController.forward(from: 0.0),
-                    child: const Icon(Icons.restart_alt),
-                  )
-                ],
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Stack(
+          children: [
+            SizedBox(
+              height: double.infinity,
+              width: double.infinity,
+              child: CircularProgressIndicator(
+                strokeWidth: 24.0,
+                valueColor: AlwaysStoppedAnimation<Color>(_progressValueColor),
+                backgroundColor: _progressBackgroundColor,
+                value: _animation.value / widget.duration.inSeconds,
               ),
             ),
-          ),
-        ],
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showMaterialNumberPicker(
+                          context: context,
+                          title: 'How many minutes do you want to run this task?',
+                          step: 5,
+                          minNumber: 5,
+                          maxNumber: 100,
+                          selectedNumber: widget.duration.inMinutes,
+                          onChanged: (newDuration) => widget
+                              .onSetDuration(Duration(minutes: newDuration)),
+                        );
+                      },
+                      child: Text(
+                        Duration(
+                                seconds: widget.duration.inSeconds -
+                                    _animation.value.toInt())
+                            .toString()
+                            .split('.')[0],
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Colors.black,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _animationController.forward(from: 0.0),
+                      child: const Icon(Icons.restart_alt),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
