@@ -27,8 +27,8 @@ class GoalsPanel extends StatelessWidget {
         log('route changed ${settings.name}');
 
         final page = switch (settings.name) {
-          routeEditGoals => _EditGoals(),
-          routeCreateGoal => _CreateGoal(),
+          routeEditGoals => _EditGoals(selectedIndex: 0),
+          routeCreateGoal => _EditGoals(),
           _ => throw StateError('Invalid route: ${settings.name}'),
         };
 
@@ -42,80 +42,66 @@ class GoalsPanel extends StatelessWidget {
 }
 
 class _EditGoals extends StatefulWidget {
+  _EditGoals({
+    super.key,
+    this.selectedIndex,
+  });
+
+  int? selectedIndex;
+
   @override
   State<_EditGoals> createState() => _EditGoalsState();
 }
 
 class _EditGoalsState extends State<_EditGoals> {
-  int? selectedIndex;
-
   @override
   Widget build(BuildContext context) {
-    log('building _EditGoalsState ${selectedIndex}');
+    StorageRoot storageRoot = Provider.of<StorageRoot>(context);
 
-    return Consumer<StorageRoot>(
-      builder: (context, storageRoot, _) => AppPanels(
-        singleLayout: GoalBrowserView(
-          storageRoot: storageRoot,
-          selectedIndex: selectedIndex,
-          onSelected: (context, newSelectedIndex) {
-            setState(() {
-              selectedIndex = newSelectedIndex;
-              log('selected $selectedIndex');
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => GoalWizard(
-                  storageRoot: storageRoot,
-                  goalIndex: selectedIndex!,
-                  onDone: () => Navigator.pop(context),
-                ),
-              ),
-            );
-          },
-        ),
-        doubleLayoutLeft: GoalBrowserView(
-          storageRoot: storageRoot,
-          selectedIndex: selectedIndex,
-          onSelected: (context, newSelectedIndex) {
-            setState(() {
-              selectedIndex = newSelectedIndex;
-              log('selected $selectedIndex');
-            });
-          },
-        ),
-        doubleLayoutRight: selectedIndex == null
-            ? const Card()
-            : GoalWizard(
+    if (widget.selectedIndex == null) {
+      storageRoot.addGoal(Goal());
+      widget.selectedIndex = storageRoot.goalsLength-1;
+    } else if (widget.selectedIndex! >= storageRoot.goalsLength) {
+      widget.selectedIndex = storageRoot.goalsLength-1;
+    }
+
+    log('building _EditGoalsState ${widget.selectedIndex}');
+    return AppPanels(
+      singleLayout: GoalBrowserView(
+        storageRoot: storageRoot,
+        selectedIndex: widget.selectedIndex,
+        onSelected: (context, newSelectedIndex) {
+          setState(() {
+            widget.selectedIndex = newSelectedIndex;
+            log('selected ${widget.selectedIndex}');
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => GoalWizard(
                 storageRoot: storageRoot,
-                goalIndex: selectedIndex!,
-                onDone: () => setState(() => selectedIndex = null),
+                goalIndex: widget.selectedIndex,
+                appbar: true,
+                onDone: () => Navigator.pop(context),
               ),
+            ),
+          );
+        },
       ),
-    );
-  }
-}
-
-class _CreateGoal extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<StorageRoot>(
-      builder: (context, storageRoot, _) => AppPanels(
-        singleLayout: GoalWizard(
-          storageRoot: storageRoot,
-          onDone: () => Navigator.pop(context),
-        ),
-        doubleLayoutLeft: GoalBrowserView(
-          storageRoot: storageRoot,
-          onSelected: (context, _) {
-            log('ignoring selection');
-          },
-        ),
-        doubleLayoutRight: GoalWizard(
-          storageRoot: storageRoot,
-          onDone: () => const Card(),
-        ),
+      doubleLayoutLeft: GoalBrowserView(
+        storageRoot: storageRoot,
+        selectedIndex: widget.selectedIndex,
+        onSelected: (context, newSelectedIndex) {
+          setState(() {
+            widget.selectedIndex = newSelectedIndex;
+            log('selected ${widget.selectedIndex}');
+          });
+        },
+      ),
+      doubleLayoutRight: GoalWizard(
+        storageRoot: storageRoot,
+        goalIndex: widget.selectedIndex,
+        onDone: () => setState(() {}),
       ),
     );
   }

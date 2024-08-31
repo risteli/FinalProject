@@ -16,6 +16,8 @@ class StorageRoot extends ChangeNotifier {
 
   UnmodifiableListView<Goal> get goals => UnmodifiableListView(_goals);
 
+  int get goalsLength => _goals.length;
+
   void loadGoals(List<Goal> goals) {
     _goals.clear();
     _goals.addAll(goals);
@@ -24,7 +26,6 @@ class StorageRoot extends ChangeNotifier {
 
   void addGoal(Goal value) {
     _goals.add(value);
-    notifyListeners();
   }
 
   void updateGoalAt(int index, Goal value) {

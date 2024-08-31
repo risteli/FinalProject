@@ -37,7 +37,7 @@ class _GoalTileState extends State<GoalTile> {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(widget.goal.id!.toString()),
+      key: Key(widget.goal.id?.toString() ?? 'new-task'),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
         widget.onDelete();
