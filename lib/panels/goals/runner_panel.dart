@@ -28,7 +28,8 @@ class RunnerPanel extends StatelessWidget {
         final page = switch (settings.name) {
           routeShowRunnables =>
             _RunnableGoals(navigationStateKey: navigationStateKey),
-          routeRunTask => RunTask(),
+          routeRunTask =>
+            RunTask(task: settings.arguments as Task),
           _ => throw StateError('Invalid route: ${settings.name}'),
         };
 

@@ -12,7 +12,10 @@ import '../../models/roots.dart';
 class RunTask extends StatefulWidget {
   const RunTask({
     super.key,
+    required this.task,
   });
+
+  final Task task;
 
   @override
   State<RunTask> createState() => _RunTaskState();
@@ -22,47 +25,50 @@ class _RunTaskState extends State<RunTask> {
   final runController = TaskProgressController();
 
   @override
+  void dispose() {
+    log('disposing of task $widget.task');
+    if (widget.task.status!.status == TaskStatusValue.started) {
+      widget.task.status!.status = TaskStatusValue.stopped;
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final goalsModel = Provider.of<GoalsModel>(context);
-
-    final task = ModalRoute.of(context)!.settings.arguments as Task;
-    final goal = goalsModel.findById(task.goalId);
-
-    log('run task $task ${task.status}');
+    log('run task $widget.task ${widget.task.status}');
 
     return RunTaskUI(
-      status: task.status!,
       runController: runController,
       runTaskController: RunTaskUIController(
         onStart: () {
           setState(() {
-            task.status!.status = TaskStatusValue.started;
+            widget.task.status!.status = TaskStatusValue.started;
           });
-          log('starting the task, now ${task.status!}');
+          log('starting the task, now ${widget.task.status!}');
           runController.resume();
         },
         onStop: () {
           setState(() {
-            task.status!.status = TaskStatusValue.stopped;
+            widget.task.status!.status = TaskStatusValue.stopped;
           });
-          log('stopping the task, now ${task.status!}');
+          log('stopping the task, now ${widget.task.status!}');
           runController.pause();
         },
         onDone: () {
           setState(() {
-            task.status!.status = TaskStatusValue.done;
+            widget.task.status!.status = TaskStatusValue.done;
           });
-          log('completing the task, now ${task.status!}');
+          log('completing the task, now ${widget.task.status!}');
         },
         onRestart: () {
           setState(() {
-            task.status!.status = TaskStatusValue.ready;
+            widget.task.status!.status = TaskStatusValue.ready;
           });
-          log('restarting the task, now ${task.status!}');
+          log('restarting the task, now ${widget.task.status!}');
         },
         onSetDuration: (duration) {
           setState(() {
-            task.estimation = duration;
+            widget.task.estimation = duration;
           });
         },
       ),
@@ -75,11 +81,9 @@ class RunTaskUI extends StatelessWidget {
     super.key,
     required this.runTaskController,
     required this.runController,
-    required this.status,
   });
 
   final TaskProgressController runController;
-  final status;
   final RunTaskUIController runTaskController;
 
   @override
@@ -110,6 +114,7 @@ class RunTaskUI extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TaskProgress(
+                      task: task,
                       duration: duration,
                       controller: runController,
                       onSetDuration: runTaskController.onSetDuration,
@@ -129,10 +134,12 @@ class RunTaskUI extends StatelessWidget {
                               task: task,
                               onStart: runTaskController.onStart,
                               onStop: runTaskController.onStop),
-                          _DoneCard(task: task, onDone: runTaskController.onDone),
+                          _DoneCard(
+                              task: task, onDone: runTaskController.onDone),
                         ] else if (task.repeatable)
                           _RestartCard(
-                              task: task, onRestart: runTaskController.onRestart)
+                              task: task,
+                              onRestart: runTaskController.onRestart)
                         else
                           const _CompletedCard()
                       ],
@@ -201,7 +208,9 @@ class _InfoCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
                       style: TextStyle(
-                          color: colorScheme.secondary, fontSize: 20.0),
+                        color: colorScheme.secondary,
+                        fontSize: 20.0,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -209,7 +218,9 @@ class _InfoCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
                       style: TextStyle(
-                          color: colorScheme.secondary, fontSize: 16.0),
+                        color: colorScheme.secondary,
+                        fontSize: 16.0,
+                      ),
                     ),
                   ],
                 ),
@@ -413,11 +424,13 @@ class _CompletedCard extends StatelessWidget {
 class TaskProgress extends StatefulWidget {
   const TaskProgress({
     super.key,
+    required this.task,
     required this.duration,
     required this.controller,
     required this.onSetDuration,
   });
 
+  final Task task;
   final Duration duration;
   final TaskProgressController controller;
   final Function(Duration) onSetDuration;
@@ -464,17 +477,15 @@ class _TaskProgressState extends State<TaskProgress>
       setState(() {});
     });
 
-    widget.controller?._state = this;
+    widget.controller._state = this;
   }
 
   @override
   void reassemble() {
-    onAnimationStart();
+    if (widget.task.status!.status == TaskStatusValue.started) {
+      _animationController.forward();
+    }
     super.reassemble();
-  }
-
-  void onAnimationStart() {
-    _animationController.forward();
   }
 
   @override
@@ -487,7 +498,7 @@ class _TaskProgressState extends State<TaskProgress>
             height: double.infinity,
             width: double.infinity,
             child: CircularProgressIndicator(
-              strokeWidth: 12.0,
+              strokeWidth: 24.0,
               valueColor: AlwaysStoppedAnimation<Color>(_progressValueColor),
               backgroundColor: _progressBackgroundColor,
               value: _animation.value / widget.duration.inSeconds,
