@@ -9,13 +9,13 @@ import '../models/models.dart';
 class Storage {
   Storage._privateConstructor() {
     db = AppDatabase.instance.database;
-    goals = GoalsModel();
+    root = StorageRoot();
   }
 
   static Storage? _instance;
 
   late final Database db;
-  late final GoalsModel goals;
+  late final StorageRoot root;
 
   factory Storage() {
     _instance ??= Storage._privateConstructor();
@@ -24,7 +24,7 @@ class Storage {
 
   static Storage get instance => _instance!;
 
-  Future<GoalsModel> load() async {
+  Future<StorageRoot> load() async {
     var rawGoals = await db.query(
       AppDatabase.goalsTable,
       where: 'active=1',
@@ -53,7 +53,7 @@ class Storage {
       taskIds.add(task.id!);
       goalById[task.goalId!]!.tasks.add(task);
     }
-    goals.load(loadedGoals);
+    root.loadGoals(loadedGoals);
 
     if (taskIds.isNotEmpty) {
       var records = await db.query(
@@ -68,7 +68,7 @@ class Storage {
         taskStatusByTask[taskStatus.taskId] = taskStatus;
       }
 
-      for (var goal in goals.items) {
+      for (var goal in root.goals) {
         for (var task in goal.tasks) {
           if (taskStatusByTask.containsKey(task.id!)) {
             task.status = taskStatusByTask[task.id!];
@@ -79,12 +79,12 @@ class Storage {
       }
     }
 
-    return goals;
+    return root;
   }
 
   Future create(Goal goal) async {
-    if (goals.items.isNotEmpty) {
-      goal.position = goals.items
+    if (root.goals.isNotEmpty) {
+      goal.position = root.goals
               .reduce((v, e) => e.position > v.position ? e : v)
               .position +
           1;
@@ -104,12 +104,12 @@ class Storage {
         where: 'id=?', whereArgs: [goal.id]);
   }
 
-  Future updateGoals(GoalsModel goals) async {
+  Future updateGoals(StorageRoot goals) async {
     log('now updating $goals');
 
     var batch = db.batch();
-    for (var i = 0; i < goals.items.length; i++) {
-      var goal = goals.items[i];
+    for (var i = 0; i < goals.goals.length; i++) {
+      var goal = goals.goals[i];
       goal.position = i;
 
       var record = goal.toMap();
@@ -124,8 +124,8 @@ class Storage {
     var ids = await batch.commit();
 
     if (true) // TODO REMOVE THIS
-      for (var i = 0; i < goals.items.length; i++) {
-        log('id of $i is ${ids[i]} and was ${goals.items[i].id}');
+      for (var i = 0; i < goals.goals.length; i++) {
+        log('id of $i is ${ids[i]} and was ${goals.goals[i].id}');
       }
 
     var idsPlaceholders = List.filled(ids.length, '?').join(',');

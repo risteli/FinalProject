@@ -88,10 +88,10 @@ class RunTaskUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goalsModel = Provider.of<GoalsModel>(context);
+    final storageRoot = Provider.of<StorageRoot>(context);
 
     final task = ModalRoute.of(context)!.settings.arguments as Task;
-    final goal = goalsModel.findById(task.goalId);
+    final goal = storageRoot.findGoalById(task.goalId);
 
     Duration duration = task.estimation ?? const Duration(minutes: 25);
 

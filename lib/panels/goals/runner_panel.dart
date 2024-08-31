@@ -61,14 +61,14 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
   Widget build(BuildContext context) {
     log('building RunnableGoalsState');
 
-    return Consumer<GoalsModel>(
-      builder: (context, goalsModel, _) {
+    return Consumer<StorageRoot>(
+      builder: (context, storageRoot, _) {
         routeToRunner(task) => widget.navigationStateKey.currentState!
             .pushNamed(routeRunTask, arguments: task);
 
         return AppPanels(
           singleLayout: GoalsRunnerGoals(
-            goalsModel: goalsModel,
+            storageRoot: storageRoot,
             selectedIndex: selectedIndex,
             onSelected: (context, newSelectedIndex) {
               setState(() {
@@ -80,7 +80,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
                 MaterialPageRoute(
                   builder: (_) {
                     return GoalsRunnerTasks(
-                      goal: goalsModel.items[newSelectedIndex!],
+                      goal: storageRoot.goals[newSelectedIndex!],
                       onSelected: routeToRunner,
                     );
                   },
@@ -89,7 +89,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
             },
           ),
           doubleLayoutLeft: GoalsRunnerGoals(
-            goalsModel: goalsModel,
+            storageRoot: storageRoot,
             selectedIndex: selectedIndex,
             onSelected: (context, newSelectedIndex) {
               setState(() {
@@ -99,7 +99,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
             },
           ),
           doubleLayoutRight: GoalsRunnerTasks(
-            goal: goalsModel.items[selectedIndex!],
+            goal: storageRoot.goals[selectedIndex!],
             onSelected: routeToRunner,
           ),
         );

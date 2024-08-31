@@ -30,9 +30,9 @@ class _GoalWizardState extends State<GoalWizard> {
 
   @override
   Widget build(BuildContext context) {
-    final goalsModel = Provider.of<GoalsModel>(context);
+    final storageRoot = Provider.of<StorageRoot>(context);
 
-    log('GoalWizard ${goalsModel.items}');
+    log('GoalWizard ${storageRoot.goals}');
 
     void persistGoal() {
       if (widget.goal.id == null) {
@@ -87,7 +87,7 @@ class _GoalWizardState extends State<GoalWizard> {
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           child: Form(
             key: _formKey,
-            child: Consumer<GoalsModel>(
+            child: Consumer<StorageRoot>(
               builder: (context, goals, _) => switch (_step) {
                 1 => GoalSlideName(
                     goal: widget.goal,

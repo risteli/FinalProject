@@ -50,8 +50,8 @@ class StorageAsyncLoader extends StatelessWidget {
             );
           }
 
-          return ChangeNotifierProvider<GoalsModel>.value(
-            value: Storage.instance.goals,
+          return ChangeNotifierProvider<StorageRoot>.value(
+            value: Storage.instance.root,
             child: child,
           );
         });

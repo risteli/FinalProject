@@ -5,49 +5,49 @@ import 'models.dart';
 
 import 'dart:developer';
 
-class GoalsModel extends ChangeNotifier {
-  final List<Goal> _items = [];
+class StorageRoot extends ChangeNotifier {
+  final List<Goal> _goals = [];
 
-  GoalsModel();
+  StorageRoot();
 
-  GoalsModel.from(List<Goal> items) {
-    _items.addAll(items);
+  StorageRoot.from(List<Goal> items) {
+    _goals.addAll(items);
   }
 
-  UnmodifiableListView<Goal> get items => UnmodifiableListView(_items);
+  UnmodifiableListView<Goal> get goals => UnmodifiableListView(_goals);
 
-  void load(List<Goal> items) {
-    _items.clear();
-    _items.addAll(items);
+  void loadGoals(List<Goal> goals) {
+    _goals.clear();
+    _goals.addAll(goals);
     notifyListeners();
   }
 
-  void add(Goal value) {
-    _items.add(value);
+  void addGoal(Goal value) {
+    _goals.add(value);
     notifyListeners();
   }
 
-  void update(int index, Goal value) {
-    _items[index] = value;
+  void updateGoal(int index, Goal value) {
+    _goals[index] = value;
     notifyListeners();
   }
 
-  void delete(int index) {
-    _items.removeAt(index);
+  void deleteGoalAt(int index) {
+    _goals.removeAt(index);
     notifyListeners();
   }
 
-  void move(int oldIndex, int newIndex) {
-    _items.insert(newIndex, _items.removeAt(oldIndex));
+  void moveGoal(int oldIndex, int newIndex) {
+    _goals.insert(newIndex, _goals.removeAt(oldIndex));
     notifyListeners();
   }
 
-  Goal findById(int? goalId) {
-    return _items.firstWhere((element) => element.id == goalId);
+  Goal findGoalById(int? goalId) {
+    return _goals.firstWhere((element) => element.id == goalId);
   }
 
-  void clear() {
-    _items.clear();
+  void clearGoals() {
+    _goals.clear();
     notifyListeners();
   }
 }

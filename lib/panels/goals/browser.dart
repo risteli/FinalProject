@@ -10,12 +10,12 @@ import '../../widgets/search_bar.dart' as search_bar;
 class GoalBrowserView extends StatefulWidget {
   const GoalBrowserView({
     super.key,
-    required this.goalsModel,
+    required this.storageRoot,
     required this.onSelected,
     this.selectedIndex,
   });
 
-  final GoalsModel goalsModel;
+  final StorageRoot storageRoot;
   final Function(BuildContext context, int) onSelected;
   final int? selectedIndex;
 
@@ -38,9 +38,9 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
           const search_bar.SearchBar(),
           const SizedBox(height: 8),
           GoalBrowserList(
-            goalsModel: widget.goalsModel,
+            storageRoot: widget.storageRoot,
             onSelected: widget.onSelected,
-            onUpdatedGoals: () => storage.updateGoals(widget.goalsModel),
+            onUpdatedGoals: () => storage.updateGoals(widget.storageRoot),
             selectedIndex: widget.selectedIndex,
           ),
         ],
@@ -52,13 +52,13 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
 class GoalBrowserList extends StatefulWidget {
   const GoalBrowserList({
     super.key,
-    required this.goalsModel,
+    required this.storageRoot,
     required this.onSelected,
     required this.onUpdatedGoals,
     this.selectedIndex,
   });
 
-  final GoalsModel goalsModel;
+  final StorageRoot storageRoot;
   final Function(BuildContext context, int) onSelected;
   final Function() onUpdatedGoals;
   final int? selectedIndex;
@@ -70,20 +70,20 @@ class GoalBrowserList extends StatefulWidget {
 class _GoalBrowserListState extends State<GoalBrowserList> {
   @override
   Widget build(BuildContext context) {
-    log('building GoalBrowserList ${widget.goalsModel.items} ${widget.selectedIndex}');
+    log('building GoalBrowserList ${widget.storageRoot.goals} ${widget.selectedIndex}');
 
     return ReorderableListView(
       shrinkWrap: true,
       onReorder: (int oldIndex, int newIndex) {
         setState(() {
-          widget.goalsModel.move(oldIndex, newIndex);
+          widget.storageRoot.moveGoal(oldIndex, newIndex);
           widget.onUpdatedGoals();
         });
       },
       children: List.generate(
-        widget.goalsModel.items.length,
+        widget.storageRoot.goals.length,
         (index) {
-          var goal = widget.goalsModel.items[index];
+          var goal = widget.storageRoot.goals[index];
           return Padding(
             key: Key('goal-${index}'),
             padding: const EdgeInsets.only(bottom: 8.0),
@@ -94,7 +94,7 @@ class _GoalBrowserListState extends State<GoalBrowserList> {
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Goal "${goal.name}" dismissed')));
                 setState(() {
-                  widget.goalsModel.delete(index);
+                  widget.storageRoot.deleteGoalAt(index);
                   widget.onUpdatedGoals();
                 });
               },

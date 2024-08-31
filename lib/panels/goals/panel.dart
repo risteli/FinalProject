@@ -20,7 +20,7 @@ class GoalsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goalsModel = Provider.of<GoalsModel>(context);
+    final storageRoot = Provider.of<StorageRoot>(context);
 
     log('navigation key ${navigationStateKey}');
     return Navigator(
@@ -55,10 +55,10 @@ class _EditGoalsState extends State<_EditGoals> {
   Widget build(BuildContext context) {
     log('building _EditGoalsState ${selectedIndex}');
 
-    return Consumer<GoalsModel>(
-      builder: (context, goalsModel, _) => AppPanels(
+    return Consumer<StorageRoot>(
+      builder: (context, storageRoot, _) => AppPanels(
         singleLayout: GoalBrowserView(
-          goalsModel: goalsModel,
+          storageRoot: storageRoot,
           selectedIndex: selectedIndex,
           onSelected: (context, newSelectedIndex) {
             setState(() {
@@ -69,13 +69,13 @@ class _EditGoalsState extends State<_EditGoals> {
               context,
               MaterialPageRoute(
                 builder: (_) =>
-                    GoalWizard(goal: goalsModel.items[selectedIndex!]),
+                    GoalWizard(goal: storageRoot.goals[selectedIndex!]),
               ),
             );
           },
         ),
         doubleLayoutLeft: GoalBrowserView(
-          goalsModel: goalsModel,
+          storageRoot: storageRoot,
           selectedIndex: selectedIndex,
           onSelected: (context, newSelectedIndex) {
             setState(() {
@@ -87,7 +87,7 @@ class _EditGoalsState extends State<_EditGoals> {
         doubleLayoutRight: selectedIndex == null
             ? const Card()
             : GoalWizard(
-                goal: goalsModel.items[selectedIndex!],
+                goal: storageRoot.goals[selectedIndex!],
               ),
       ),
     );
@@ -97,11 +97,11 @@ class _EditGoalsState extends State<_EditGoals> {
 class _CreateGoal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<GoalsModel>(
-      builder: (context, goalsModel, _) => AppPanels(
+    return Consumer<StorageRoot>(
+      builder: (context, storageRoot, _) => AppPanels(
         singleLayout: GoalWizard(goal: Goal()),
         doubleLayoutLeft: GoalBrowserView(
-          goalsModel: goalsModel,
+          storageRoot: storageRoot,
           onSelected: (context, _) {
             log('ignoring selection');
           },

@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import '../models/roots.dart';
 import '../models/models.dart';
 
-var goalsFixture = GoalsModel.from(
+var goalsFixture = StorageRoot.from(
   [
     Goal(name: 'Learn BWV772 ?', goalType: GoalType.learning, tasks: [
       Task(name: 'LH Reading', estimation: Duration(minutes: 10)),
@@ -93,19 +93,19 @@ class AppDatabaseMigrations {
     await db.delete(AppDatabase.goalsTable);
 
     var batch = db.batch();
-    for (var i = 0; i < goalsFixture.items.length; i++) {
-      var goal = goalsFixture.items[i];
+    for (var i = 0; i < goalsFixture.goals.length; i++) {
+      var goal = goalsFixture.goals[i];
       goal.position = i;
       batch.insert(AppDatabase.goalsTable, goal.toMap());
     }
     var ids = await batch.commit();
 
-    for (var i = 0; i < goalsFixture.items.length; i++) {
-      goalsFixture.items[i].id = ids[i] as int;
+    for (var i = 0; i < goalsFixture.goals.length; i++) {
+      goalsFixture.goals[i].id = ids[i] as int;
     }
 
-    for (var i = 0; i < goalsFixture.items.length; i++) {
-      var goal = goalsFixture.items[i];
+    for (var i = 0; i < goalsFixture.goals.length; i++) {
+      var goal = goalsFixture.goals[i];
 
       batch = db.batch();
       for (var j = 0; j < goal.tasks.length; j++) {
@@ -120,7 +120,7 @@ class AppDatabaseMigrations {
       }
     }
 
-    goalsFixture.items.forEach((goal) {
+    goalsFixture.goals.forEach((goal) {
       log('now $goal');
     });
   }

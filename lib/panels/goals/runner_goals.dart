@@ -13,12 +13,12 @@ import '../../widgets/app_panels.dart';
 class GoalsRunnerGoals extends StatefulWidget {
   const GoalsRunnerGoals({
     super.key,
-    required this.goalsModel,
+    required this.storageRoot,
     required this.selectedIndex,
     required this.onSelected,
   });
 
-  final GoalsModel goalsModel;
+  final StorageRoot storageRoot;
   final int selectedIndex;
   final Function(BuildContext context, int) onSelected;
 
@@ -38,7 +38,7 @@ class _GoalsRunnerGoalsState extends State<GoalsRunnerGoals> {
       child: ListView(
         children: [
           GoalsRunnerGoalsList(
-            goalsModel: widget.goalsModel,
+            storageRoot: widget.storageRoot,
             onSelected: widget.onSelected,
             selectedIndex: widget.selectedIndex,
           ),
@@ -52,12 +52,12 @@ class _GoalsRunnerGoalsState extends State<GoalsRunnerGoals> {
 class GoalsRunnerGoalsList extends StatefulWidget {
   const GoalsRunnerGoalsList({
     super.key,
-    required this.goalsModel,
+    required this.storageRoot,
     required this.onSelected,
     this.selectedIndex,
   });
 
-  final GoalsModel goalsModel;
+  final StorageRoot storageRoot;
   final Function(BuildContext context, int) onSelected;
   final int? selectedIndex;
 
@@ -68,14 +68,14 @@ class GoalsRunnerGoalsList extends StatefulWidget {
 class _GoalsRunnerGoalsListState extends State<GoalsRunnerGoalsList> {
   @override
   Widget build(BuildContext context) {
-    log('building GoalsRunnerGoalsList ${widget.goalsModel.items} ${widget.selectedIndex}');
+    log('building GoalsRunnerGoalsList ${widget.storageRoot.goals} ${widget.selectedIndex}');
 
     return ListView(
       shrinkWrap: true,
       children: List.generate(
-        widget.goalsModel.items.length,
+        widget.storageRoot.goals.length,
             (index) {
-          var goal = widget.goalsModel.items[index];
+          var goal = widget.storageRoot.goals[index];
           return Padding(
             key: Key('goal-${index}'),
             padding: const EdgeInsets.only(bottom: 8.0),
