@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:final_project/repository/storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -23,12 +24,54 @@ class RunTask extends StatefulWidget {
 
 class _RunTaskState extends State<RunTask> {
   final runController = TaskProgressController();
+  late final taskStatus = widget.task.status!;
+
+  void start() {
+    taskStatus.status = TaskStatusValue.started;
+    taskStatus.startedAt ??= DateTime.now();
+    taskStatus.lastRunAt = DateTime.now();
+    taskStatus.duration ??= const Duration();
+
+    log('starting the task, now ${taskStatus}');
+
+    Storage.instance.updateTaskStatus(taskStatus);
+    runController.resume();
+  }
+
+  void stop() {
+    taskStatus.status = TaskStatusValue.stopped;
+    if (taskStatus.startedAt != null) {
+      taskStatus.duration = (taskStatus.duration ?? const Duration()) +
+          DateTime.now().difference(taskStatus.lastRunAt!);
+    }
+
+    log('stopping the task, now ${taskStatus}');
+
+    Storage.instance.updateTaskStatus(taskStatus);
+    runController.pause();
+  }
+
+  void done() {
+    if (taskStatus.status == TaskStatusValue.started) {
+      stop();
+    }
+
+    taskStatus.status = TaskStatusValue.done;
+    Storage.instance.updateTaskStatus(taskStatus);
+    Storage.instance.addTaskToHistory(taskStatus);
+  }
+
+  void restart() {
+    if (taskStatus.status == TaskStatusValue.done && widget.task.repeatable) {
+      taskStatus.status = TaskStatusValue.ready;
+      Storage.instance.updateTaskStatus(taskStatus);
+    }
+  }
 
   @override
   void dispose() {
-    log('disposing of task $widget.task');
-    if (widget.task.status!.status == TaskStatusValue.started) {
-      widget.task.status!.status = TaskStatusValue.stopped;
+    if (taskStatus.status == TaskStatusValue.started) {
+      stop();
     }
     super.dispose();
   }
@@ -37,48 +80,21 @@ class _RunTaskState extends State<RunTask> {
   Widget build(BuildContext context) {
     final storageRoot = Provider.of<StorageRoot>(context);
 
-    var taskStatus = widget.task.status!;
-
     taskStatus.timebox ??= storageRoot.config.defaultTimebox;
     taskStatus.cooldown ??= storageRoot.config.defaultCooldown;
 
     return RunTaskUI(
       runController: runController,
       runTaskController: RunTaskUIController(
-        onStart: () {
-          setState(() {
-            taskStatus.status = TaskStatusValue.started;
-            taskStatus.startedAt ??= DateTime.now();
-            taskStatus.lastRunAt = DateTime.now();
-            taskStatus.duration ??= const Duration();
-          });
-          log('starting the task, now ${taskStatus}');
-          runController.resume();
-        },
-        onStop: () {
-          setState(() {
-            taskStatus!.status = TaskStatusValue.stopped;
-          });
-          log('stopping the task, now ${taskStatus}');
-          runController.pause();
-        },
-        onDone: () {
-          setState(() {
-            taskStatus!.status = TaskStatusValue.done;
-          });
-          log('completing the task, now ${taskStatus!}');
-        },
-        onRestart: () {
-          setState(() {
-            taskStatus!.status = TaskStatusValue.ready;
-          });
-          log('restarting the task, now ${taskStatus!}');
-        },
-        onSetDuration: (duration) {
-          setState(() {
-            widget.task.estimation = duration;
-          });
-        },
+        onStart: () => setState(() => start()),
+        onStop: () => setState(() => stop()),
+        onDone: () => setState(() => done()),
+        onRestart: () => setState(() => restart()),
+        onSetTimebox: (duration) => setState(() {
+          log('on set timebox $duration');
+          taskStatus.timebox = duration;
+          Storage.instance.updateTaskStatus(taskStatus);
+        }),
       ),
     );
   }
@@ -101,8 +117,6 @@ class RunTaskUI extends StatelessWidget {
     final task = ModalRoute.of(context)!.settings.arguments as Task;
     final goal = storageRoot.findGoalById(task.goalId);
 
-    Duration duration = task.estimation ?? const Duration(minutes: 25);
-
     return Card(
       child: Column(
         children: [
@@ -123,9 +137,9 @@ class RunTaskUI extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: TaskProgress(
                       task: task,
-                      duration: duration,
+                      timebox: task.status!.timebox!,
                       controller: runController,
-                      onSetDuration: runTaskController.onSetDuration,
+                      onSetTimebox: runTaskController.onSetTimebox,
                     ),
                   ),
                 ),
@@ -169,14 +183,14 @@ class RunTaskUIController {
     required this.onStop,
     required this.onDone,
     required this.onRestart,
-    required this.onSetDuration,
+    required this.onSetTimebox,
   });
 
   final Function() onStart;
   final Function() onStop;
   final Function() onDone;
   final Function() onRestart;
-  final Function(Duration) onSetDuration;
+  final Function(Duration) onSetTimebox;
 }
 
 class _InfoCard extends StatelessWidget {
@@ -433,15 +447,15 @@ class TaskProgress extends StatefulWidget {
   const TaskProgress({
     super.key,
     required this.task,
-    required this.duration,
+    required this.timebox,
     required this.controller,
-    required this.onSetDuration,
+    required this.onSetTimebox,
   });
 
   final Task task;
-  final Duration duration;
+  final Duration timebox;
   final TaskProgressController controller;
-  final Function(Duration) onSetDuration;
+  final Function(Duration) onSetTimebox;
 
   @override
   State<TaskProgress> createState() => _TaskProgressState();
@@ -468,11 +482,11 @@ class _TaskProgressState extends State<TaskProgress>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: widget.duration,
+      duration: widget.timebox,
     );
     _animation = Tween<double>(
       begin: 0.0,
-      end: widget.duration.inSeconds.toDouble(),
+      end: widget.timebox.inSeconds.toDouble(),
     ).animate(_animationController);
 
     _animationController.addStatusListener((status) {
@@ -511,7 +525,7 @@ class _TaskProgressState extends State<TaskProgress>
                 strokeWidth: 24.0,
                 valueColor: AlwaysStoppedAnimation<Color>(_progressValueColor),
                 backgroundColor: _progressBackgroundColor,
-                value: _animation.value / widget.duration.inSeconds,
+                value: _animation.value / widget.timebox.inSeconds,
               ),
             ),
             Center(
@@ -524,18 +538,19 @@ class _TaskProgressState extends State<TaskProgress>
                       onTap: () {
                         showMaterialNumberPicker(
                           context: context,
-                          title: 'How many minutes do you want to run this task?',
+                          title:
+                              'How many minutes do you want to run this task?',
                           step: 5,
                           minNumber: 5,
                           maxNumber: 100,
-                          selectedNumber: widget.duration.inMinutes,
+                          selectedNumber: widget.timebox.inMinutes,
                           onChanged: (newDuration) => widget
-                              .onSetDuration(Duration(minutes: newDuration)),
+                              .onSetTimebox(Duration(minutes: newDuration)),
                         );
                       },
                       child: Text(
                         Duration(
-                                seconds: widget.duration.inSeconds -
+                                seconds: widget.timebox.inSeconds -
                                     _animation.value.toInt())
                             .toString()
                             .split('.')[0],

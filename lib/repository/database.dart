@@ -148,7 +148,7 @@ class AppDatabaseInit {
   static Future<AppDatabase> init() async {
     String dbName = join(await getDatabasesPath(), 'taskchisel.db');
 
-    if (true) // enable to drop the db and rebuild it
+    if (false) // enable to drop the db and rebuild it
       await databaseExists(dbName)
           .then((exists) => exists ? deleteDatabase(dbName) : null);
 

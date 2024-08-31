@@ -29,7 +29,7 @@ class Storage {
       AppDatabase.configTable,
     );
 
-    Map<String,String> configMap = {};
+    Map<String, String> configMap = {};
     for (var record in configKV) {
       configMap[record['key'] as String] = record['value'] as String;
     }
@@ -176,7 +176,12 @@ class Storage {
 
   Future updateTaskStatus(TaskStatus taskStatus) async {
     log('now updating $taskStatus ${taskStatus.toMap()}');
-    await db.update(AppDatabase.taskStatusTable, taskStatus.toMap(),
-        where: 'task_id=?', whereArgs: [taskStatus.taskId]);
+    await db.insert(AppDatabase.taskStatusTable, taskStatus.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future addTaskToHistory(TaskStatus taskStatus) async {
+    log('now adding $taskStatus ${taskStatus.toMap()} to history');
+    await db.insert(AppDatabase.taskHistoryTable, taskStatus.toMap());
   }
 }
