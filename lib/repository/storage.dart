@@ -6,27 +6,25 @@ import 'package:sqflite/sqflite.dart';
 import '../models/roots.dart';
 import '../models/models.dart';
 
-class GoalsRepo {
-  GoalsRepo._privateConstructor() {
+class Storage {
+  Storage._privateConstructor() {
     db = AppDatabase.instance.database;
     goals = GoalsModel();
   }
 
-  static GoalsRepo? _instance;
+  static Storage? _instance;
 
   late final Database db;
   late final GoalsModel goals;
 
-  factory GoalsRepo() {
-    _instance ??= GoalsRepo._privateConstructor();
+  factory Storage() {
+    _instance ??= Storage._privateConstructor();
     return _instance!;
   }
 
-  static GoalsRepo get instance => _instance!;
+  static Storage get instance => _instance!;
 
   Future<GoalsModel> load() async {
-    log('goalsrepo load called');
-
     var rawGoals = await db.query(
       AppDatabase.goalsTable,
       where: 'active=1',

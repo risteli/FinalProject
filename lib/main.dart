@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:final_project/repository/database.dart';
-import 'package:final_project/repository/goals.dart';
+import 'package:final_project/repository/storage.dart';
 import 'package:flutter/material.dart';
 
 import 'app.dart';
@@ -10,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   AppDatabaseInit.init().then((db) {
-    GoalsRepo();
+    Storage();
     runApp(const MainApp());
   });
 }

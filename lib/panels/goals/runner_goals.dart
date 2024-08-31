@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../models/roots.dart';
-import '../../repository/goals.dart';
+import '../../repository/storage.dart';
 import '../../widgets/app_panels.dart';
 
 class GoalsRunnerGoals extends StatefulWidget {
@@ -27,7 +27,7 @@ class GoalsRunnerGoals extends StatefulWidget {
 }
 
 class _GoalsRunnerGoalsState extends State<GoalsRunnerGoals> {
-  final goalsRepo = GoalsRepo();
+  final storage = Storage();
 
   @override
   Widget build(BuildContext context) {

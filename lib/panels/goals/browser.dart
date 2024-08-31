@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../../models/roots.dart';
 
-import '../../repository/goals.dart';
+import '../../repository/storage.dart';
 import 'goal_tile.dart';
 import '../../widgets/search_bar.dart' as search_bar;
 
@@ -24,7 +24,7 @@ class GoalBrowserView extends StatefulWidget {
 }
 
 class _GoalBrowserViewState extends State<GoalBrowserView> {
-  final goalsRepo = GoalsRepo();
+  final storage = Storage();
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
           GoalBrowserList(
             goalsModel: widget.goalsModel,
             onSelected: widget.onSelected,
-            onUpdatedGoals: () => goalsRepo.updateGoals(widget.goalsModel),
+            onUpdatedGoals: () => storage.updateGoals(widget.goalsModel),
             selectedIndex: widget.selectedIndex,
           ),
         ],

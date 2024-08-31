@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/roots.dart';
-import '../../repository/goals.dart';
+import '../../repository/storage.dart';
 
-class GoalsAsyncLoader extends StatelessWidget {
-  const GoalsAsyncLoader({
+class StorageAsyncLoader extends StatelessWidget {
+  const StorageAsyncLoader({
     super.key,
     required this.child,
   });
@@ -17,7 +17,7 @@ class GoalsAsyncLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: GoalsRepo.instance.load(),
+        future: Storage.instance.load(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasError) {
             log('error while loading data on GoalsAsyncLoader: ${snapshot.error}');
@@ -51,7 +51,7 @@ class GoalsAsyncLoader extends StatelessWidget {
           }
 
           return ChangeNotifierProvider<GoalsModel>.value(
-            value: GoalsRepo.instance.goals,
+            value: Storage.instance.goals,
             child: child,
           );
         });

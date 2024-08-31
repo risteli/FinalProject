@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:final_project/repository/goals.dart';
+import 'package:final_project/repository/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,14 +36,14 @@ class _GoalWizardState extends State<GoalWizard> {
 
     void persistGoal() {
       if (widget.goal.id == null) {
-        GoalsRepo.instance.create(widget.goal).then((_) {
+        Storage.instance.create(widget.goal).then((_) {
           setState(() {
             log('created ${widget.goal}');
           });
           return;
         });
       } else {
-        GoalsRepo.instance.update(widget.goal).then((_) {
+        Storage.instance.update(widget.goal).then((_) {
           setState(() {
             log('updated ${widget.goal}');
           });

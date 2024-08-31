@@ -32,7 +32,7 @@ class _AppState extends State<App> {
     Destination(
       icon: Icons.sports_score_outlined,
       label: 'Goals',
-      widget: GoalsAsyncLoader(
+      widget: StorageAsyncLoader(
         child: GoalsPanel(
           navigationStateKey: goalsNavigatorStateKey,
         ),
@@ -41,7 +41,7 @@ class _AppState extends State<App> {
     Destination(
       icon: Icons.schedule_outlined,
       label: 'Run',
-      widget: GoalsAsyncLoader(
+      widget: StorageAsyncLoader(
         child: RunnerPanel(
           navigationStateKey: runnerNavigatorStateKey,
         ),

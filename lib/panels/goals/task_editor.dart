@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'task_tile.dart';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
-import '../../repository/goals.dart';
+import '../../repository/storage.dart';
 
 class TaskList extends StatefulWidget {
   const TaskList({
@@ -35,7 +35,7 @@ class _TaskListState extends State<TaskList> {
         onReorder: (int oldIndex, int newIndex) {
           log('reorder $oldIndex to $newIndex');
           setState(() => tasks.insert(newIndex, tasks.removeAt(oldIndex)));
-          GoalsRepo.instance.updateTasks(widget.goal);
+          Storage.instance.updateTasks(widget.goal);
         },
         children: [
           for (var task in tasks)
@@ -48,7 +48,7 @@ class _TaskListState extends State<TaskList> {
                     SnackBar(content: Text('Task "${task.name}" dismissed')));
                 setState(() {
                   widget.goal.tasks.remove(task);
-                  GoalsRepo.instance.updateTasks(widget.goal);
+                  Storage.instance.updateTasks(widget.goal);
                 });
               },
             ),
@@ -68,7 +68,7 @@ class _TaskListState extends State<TaskList> {
                 );
                 tasks.add(task);
                 newTaskController.clear();
-                GoalsRepo.instance.createTask(task);
+                Storage.instance.createTask(task);
               });
             },
           ),

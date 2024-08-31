@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
-import '../../repository/goals.dart';
+import '../../repository/storage.dart';
 
 class TaskTile extends StatefulWidget {
   const TaskTile({
@@ -47,7 +47,7 @@ class _TaskTileState extends State<TaskTile> {
         onSubmitted: (value) {
           setState(() {
             widget.task.name = value;
-            GoalsRepo.instance.updateTask(widget.task);
+            Storage.instance.updateTask(widget.task);
             isEditing = false;
           });
         },
@@ -79,7 +79,7 @@ class _TaskTileState extends State<TaskTile> {
           child: Icon(widget.task.repeatable ? Icons.repeat_on : Icons.repeat),
           onTap: () => setState(() {
             widget.task.repeatable = !widget.task.repeatable;
-            GoalsRepo.instance.updateTask(widget.task);
+            Storage.instance.updateTask(widget.task);
           }),
         ),
       ),
