@@ -137,8 +137,10 @@ class RunTaskUI extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: _TimeboxCard(
                       task: task,
-                      timebox: task.status!.timebox!,
-                      cooldown: task.status!.cooldown!,
+                      timebox: const Duration(seconds: 10),
+                      //task.status!.timebox!,
+                      cooldown: const Duration(seconds: 5),
+                      //task.status!.cooldown!,
                       controller: runController,
                       onSetTimebox: runTaskController.onSetTimebox,
                     ),
@@ -475,6 +477,8 @@ class _TimeboxCardState extends State<_TimeboxCard>
   late final backgroundColor = Color.alphaBlend(
       _colorScheme.secondary.withOpacity(0.14), _colorScheme.surface);
 
+  bool isTimebox = true;
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -484,18 +488,40 @@ class _TimeboxCardState extends State<_TimeboxCard>
   @override
   void initState() {
     super.initState();
+
     _animationController = AnimationController(
       vsync: this,
       duration: widget.timebox,
     );
+
     _animation = Tween<double>(
       begin: 0.0,
       end: widget.timebox.inSeconds.toDouble(),
     ).animate(_animationController);
 
     _animationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        log('completed');
+      if (status == AnimationStatus.completed && isTimebox) {
+        isTimebox = false;
+        _animationController.duration = widget.cooldown;
+
+        _animation = Tween<double>(
+          begin: 0.0,
+          end: widget.cooldown.inSeconds.toDouble(),
+        ).animate(_animationController);
+
+        _animationController.reverse();
+        log('timebox completed');
+      }
+      if (status == AnimationStatus.dismissed && !isTimebox) {
+        isTimebox = true;
+        _animationController.duration = widget.timebox;
+
+        _animation = Tween<double>(
+          begin: 0.0,
+          end: widget.timebox.inSeconds.toDouble(),
+        ).animate(_animationController);
+
+        log('cooldown completed');
       }
     });
 
@@ -504,6 +530,7 @@ class _TimeboxCardState extends State<_TimeboxCard>
     });
 
     widget.controller._state = this;
+    isTimebox = true;
   }
 
   @override
@@ -524,7 +551,6 @@ class _TimeboxCardState extends State<_TimeboxCard>
         final size = constraints.maxWidth > constraints.maxHeight
             ? constraints.maxHeight
             : constraints.maxWidth;
-        log('layout $constraints $size');
         return Center(
           child: SizedBox(
             width: size,
@@ -545,7 +571,10 @@ class _TimeboxCardState extends State<_TimeboxCard>
                             strokeWidth: size / 13.0,
                             color: _progressValueColor,
                             backgroundColor: _progressBackgroundColor,
-                            value: _animation.value / widget.timebox.inSeconds,
+                            value: _animation.value /
+                                (isTimebox
+                                    ? widget.timebox.inSeconds
+                                    : widget.cooldown.inSeconds),
                           ),
                         ),
                         Center(
@@ -570,9 +599,11 @@ class _TimeboxCardState extends State<_TimeboxCard>
                                     );
                                   },
                                   child: Text(
-                                    timeFormatter(Duration(
-                                        seconds: widget.timebox.inSeconds -
-                                            _animation.value.toInt())),
+                                    timeFormatter(isTimebox
+                                        ? Duration(
+                                            seconds: widget.timebox.inSeconds -
+                                                _animation.value.toInt())
+                                        : Duration()),
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyLarge!
@@ -586,13 +617,13 @@ class _TimeboxCardState extends State<_TimeboxCard>
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      "TIMEBOX",
+                                      isTimebox ? "TIMEBOX" : "COOLDOWN",
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyLarge!
                                           .copyWith(
                                               color: Colors.black,
-                                              fontSize: size / 9.0,
+                                              fontSize: size / 12.0,
                                               fontWeight: FontWeight.w600),
                                     ),
                                   ),
@@ -613,9 +644,10 @@ class _TimeboxCardState extends State<_TimeboxCard>
                                     );
                                   },
                                   child: Text(
-                                    timeFormatter(Duration(
-                                        seconds: widget.cooldown.inSeconds -
-                                            _animation.value.toInt())),
+                                    timeFormatter(isTimebox
+                                        ? widget.cooldown
+                                        : Duration(
+                                            seconds: _animation.value.toInt())),
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyLarge!
