@@ -70,9 +70,15 @@ class _RunTaskState extends State<RunTask> {
 
   @override
   void dispose() {
-    if (taskStatus.status == TaskStatusValue.started) {
-      stop();
+    taskStatus.status = TaskStatusValue.stopped;
+    if (taskStatus.startedAt != null) {
+      taskStatus.duration = (taskStatus.duration ?? const Duration()) +
+          DateTime.now().difference(taskStatus.lastRunAt!);
     }
+
+    log('stopping the task, now ${taskStatus}');
+
+    Storage.instance.updateTaskStatus(taskStatus);
     super.dispose();
   }
 
