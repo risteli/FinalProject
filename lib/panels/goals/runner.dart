@@ -135,9 +135,10 @@ class RunTaskUI extends StatelessWidget {
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: TaskProgress(
+                    child: _TimeboxCard(
                       task: task,
                       timebox: task.status!.timebox!,
+                      cooldown: task.status!.cooldown!,
                       controller: runController,
                       onSetTimebox: runTaskController.onSetTimebox,
                     ),
@@ -149,7 +150,7 @@ class RunTaskUI extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (task.status!.status != TaskStatusValue.done) ...[
                           _StartStopCard(
@@ -284,8 +285,7 @@ class _StartStopCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text(
-                        'If you want, you can keep track of how long the task takes!'),
+                    const Text('Keep track of how long the task takes'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -443,25 +443,27 @@ class _CompletedCard extends StatelessWidget {
 
 // based on https://github.com/AndresR173/countdown_progress_indicator/blob/main/lib/countdown_progress_indicator.dart
 
-class TaskProgress extends StatefulWidget {
-  const TaskProgress({
+class _TimeboxCard extends StatefulWidget {
+  const _TimeboxCard({
     super.key,
     required this.task,
     required this.timebox,
+    required this.cooldown,
     required this.controller,
     required this.onSetTimebox,
   });
 
   final Task task;
   final Duration timebox;
+  final Duration cooldown;
   final TaskProgressController controller;
   final Function(Duration) onSetTimebox;
 
   @override
-  State<TaskProgress> createState() => _TaskProgressState();
+  State<_TimeboxCard> createState() => _TimeboxCardState();
 }
 
-class _TaskProgressState extends State<TaskProgress>
+class _TimeboxCardState extends State<_TimeboxCard>
     with SingleTickerProviderStateMixin {
   late Animation<double> _animation;
   late AnimationController _animationController;
@@ -469,6 +471,9 @@ class _TaskProgressState extends State<TaskProgress>
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _progressValueColor = _colorScheme.primary;
   late final _progressBackgroundColor = _colorScheme.onPrimary;
+
+  late final backgroundColor = Color.alphaBlend(
+      _colorScheme.secondary.withOpacity(0.14), _colorScheme.surface);
 
   @override
   void dispose() {
@@ -509,82 +514,136 @@ class _TaskProgressState extends State<TaskProgress>
     super.reassemble();
   }
 
+  var timeFormatter = (Duration d) =>
+      "${d.inMinutes.toString().padLeft(2, '0')}:${d.inSeconds.remainder(60).toString().padLeft(2, '0')}";
+
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final size = constraints.maxWidth;
-          return Padding(
-            padding: EdgeInsets.all(size / 30.0),
-            child: Stack(
-              children: [
-                SizedBox(
-                  height: double.infinity,
-                  width: double.infinity,
-                  child: CircularProgressIndicator(
-                    strokeWidth: size / 13.0,
-                    color:_progressValueColor,
-                    backgroundColor: _progressBackgroundColor,
-                    value: _animation.value / widget.timebox.inSeconds,
-                  ),
-                ),
-                Center(
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final size = constraints.maxWidth > constraints.maxHeight
+            ? constraints.maxHeight
+            : constraints.maxWidth;
+        log('layout $constraints $size');
+        return Center(
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Card(
+              color: backgroundColor,
+              child: Padding(
+                padding: EdgeInsets.all(size / 30.0),
+                child: Center(
                   child: Padding(
-                    padding: EdgeInsets.all(size/60.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    padding: EdgeInsets.all(size / 30.0),
+                    child: Stack(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            showMaterialNumberPicker(
-                              context: context,
-                              title:
-                                  'How many minutes do you want to run this task?',
-                              step: 5,
-                              minNumber: 5,
-                              maxNumber: 100,
-                              selectedNumber: widget.timebox.inMinutes,
-                              onChanged: (newDuration) => widget
-                                  .onSetTimebox(Duration(minutes: newDuration)),
-                            );
-                          },
-                          child: Text(
-                            Duration(
-                                    seconds: widget.timebox.inSeconds -
-                                        _animation.value.toInt())
-                                .toString()
-                                .split('.')[0],
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(
-                                    color: Colors.black,
-                                    fontSize: size / 6.0,
-                                    fontWeight: FontWeight.w600),
+                        SizedBox(
+                          height: double.infinity,
+                          width: double.infinity,
+                          child: CircularProgressIndicator(
+                            strokeWidth: size / 13.0,
+                            color: _progressValueColor,
+                            backgroundColor: _progressBackgroundColor,
+                            value: _animation.value / widget.timebox.inSeconds,
                           ),
                         ),
-                        ElevatedButton(
-                          onPressed: () =>
-                              _animationController.forward(from: 0.0),
-                          child: Icon(Icons.restart_alt, size: size/8.0),
-                        )
+                        Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(size / 60.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showMaterialNumberPicker(
+                                      context: context,
+                                      title:
+                                          'How many minutes do you want to run this task?',
+                                      step: 5,
+                                      minNumber: 5,
+                                      maxNumber: 120,
+                                      selectedNumber: widget.timebox.inMinutes,
+                                      onChanged: (newDuration) =>
+                                          widget.onSetTimebox(
+                                              Duration(minutes: newDuration)),
+                                    );
+                                  },
+                                  child: Text(
+                                    timeFormatter(Duration(
+                                        seconds: widget.timebox.inSeconds -
+                                            _animation.value.toInt())),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                            color: Colors.black,
+                                            fontSize: size / 9.0,
+                                            fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                                Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "TIMEBOX",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(
+                                              color: Colors.black,
+                                              fontSize: size / 9.0,
+                                              fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    showMaterialNumberPicker(
+                                      context: context,
+                                      title:
+                                          'How many minutes do you want to pause after this task?',
+                                      step: 5,
+                                      minNumber: 0,
+                                      maxNumber: 100,
+                                      selectedNumber: widget.cooldown.inMinutes,
+                                      onChanged: (newDuration) =>
+                                          widget.onSetTimebox(
+                                              Duration(minutes: newDuration)),
+                                    );
+                                  },
+                                  child: Text(
+                                    timeFormatter(Duration(
+                                        seconds: widget.cooldown.inSeconds -
+                                            _animation.value.toInt())),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                            color: Colors.black,
+                                            fontSize: size / 9.0,
+                                            fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 class TaskProgressController {
-  late _TaskProgressState _state;
+  late _TimeboxCardState _state;
 
   void pause() => _state._animationController.stop(canceled: false);
 
