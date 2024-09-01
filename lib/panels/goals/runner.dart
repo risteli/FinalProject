@@ -467,9 +467,8 @@ class _TaskProgressState extends State<TaskProgress>
   late AnimationController _animationController;
 
   late final _colorScheme = Theme.of(context).colorScheme;
-  late final _progressValueColor = _colorScheme.secondary;
-  late final _progressBackgroundColor = Color.alphaBlend(
-      _colorScheme.primary.withOpacity(0.30), _colorScheme.surface);
+  late final _progressValueColor = _colorScheme.primary;
+  late final _progressBackgroundColor = _colorScheme.onPrimary;
 
   @override
   void dispose() {
@@ -512,64 +511,73 @@ class _TaskProgressState extends State<TaskProgress>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: Stack(
-          children: [
-            SizedBox(
-              height: double.infinity,
-              width: double.infinity,
-              child: CircularProgressIndicator(
-                strokeWidth: 24.0,
-                valueColor: AlwaysStoppedAnimation<Color>(_progressValueColor),
-                backgroundColor: _progressBackgroundColor,
-                value: _animation.value / widget.timebox.inSeconds,
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showMaterialNumberPicker(
-                          context: context,
-                          title:
-                              'How many minutes do you want to run this task?',
-                          step: 5,
-                          minNumber: 5,
-                          maxNumber: 100,
-                          selectedNumber: widget.timebox.inMinutes,
-                          onChanged: (newDuration) => widget
-                              .onSetTimebox(Duration(minutes: newDuration)),
-                        );
-                      },
-                      child: Text(
-                        Duration(
-                                seconds: widget.timebox.inSeconds -
-                                    _animation.value.toInt())
-                            .toString()
-                            .split('.')[0],
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Colors.black,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _animationController.forward(from: 0.0),
-                      child: const Icon(Icons.restart_alt),
-                    )
-                  ],
+    return AspectRatio(
+      aspectRatio: 1,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final size = constraints.maxWidth;
+          return Padding(
+            padding: EdgeInsets.all(size / 30.0),
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: CircularProgressIndicator(
+                    strokeWidth: size / 13.0,
+                    color:_progressValueColor,
+                    backgroundColor: _progressBackgroundColor,
+                    value: _animation.value / widget.timebox.inSeconds,
+                  ),
                 ),
-              ),
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(size/60.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            showMaterialNumberPicker(
+                              context: context,
+                              title:
+                                  'How many minutes do you want to run this task?',
+                              step: 5,
+                              minNumber: 5,
+                              maxNumber: 100,
+                              selectedNumber: widget.timebox.inMinutes,
+                              onChanged: (newDuration) => widget
+                                  .onSetTimebox(Duration(minutes: newDuration)),
+                            );
+                          },
+                          child: Text(
+                            Duration(
+                                    seconds: widget.timebox.inSeconds -
+                                        _animation.value.toInt())
+                                .toString()
+                                .split('.')[0],
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(
+                                    color: Colors.black,
+                                    fontSize: size / 6.0,
+                                    fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () =>
+                              _animationController.forward(from: 0.0),
+                          child: Icon(Icons.restart_alt, size: size/8.0),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
