@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:final_project/panels/goals/runner_tasks_tile.dart';
+import 'package:final_project/panels/runner/tasks_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';

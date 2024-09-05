@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/roots.dart';
-import '../../repository/storage.dart';
+import '../models/roots.dart';
+import 'storage.dart';
 
 class StorageAsyncLoader extends StatelessWidget {
   const StorageAsyncLoader({

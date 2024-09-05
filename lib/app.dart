@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:final_project/panels/goals/panel.dart';
-import 'package:final_project/panels/goals/loader.dart';
-import 'package:final_project/panels/goals/runner_panel.dart';
+import 'package:final_project/repository/loader.dart';
+import 'package:final_project/panels/runner/panel.dart';
 import 'package:final_project/routes.dart';
 import 'package:final_project/top.dart';
 import 'package:flutter/material.dart';
