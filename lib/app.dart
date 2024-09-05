@@ -35,19 +35,15 @@ class _AppState extends State<App> {
     Destination(
       icon: Icons.sports_score_outlined,
       label: 'Goals',
-      widget: StorageAsyncLoader(
-        child: GoalsPanel(
-          topController: topController,
-        ),
+      widget: GoalsPanel(
+        topController: topController,
       ),
     ),
     Destination(
       icon: Icons.schedule_outlined,
       label: 'Run',
-      widget: StorageAsyncLoader(
-        child: RunnerPanel(
-          navigationStateKey: runnerNavigatorStateKey,
-        ),
+      widget: RunnerPanel(
+        navigationStateKey: runnerNavigatorStateKey,
       ),
     ),
     const Destination(
@@ -64,43 +60,45 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000;
 
-    return Scaffold(
-      body: Row(
-        children: [
-          if (doubleRail)
-            AppNavigationRail(
-              selectedIndex: currentIndex,
-              backgroundColor: _backgroundColor,
-              destinations: destinations,
-              onDestinationSelected: (index) =>
-                  setState(() => currentIndex = index),
-              onCreateButtonPressed: () => topController.create(),
+    return StorageAsyncLoader(
+      child: Scaffold(
+        body: Row(
+          children: [
+            if (doubleRail)
+              AppNavigationRail(
+                selectedIndex: currentIndex,
+                backgroundColor: _backgroundColor,
+                destinations: destinations,
+                onDestinationSelected: (index) =>
+                    setState(() => currentIndex = index),
+                onCreateButtonPressed: () => topController.create(),
+              ),
+            Expanded(
+              child: Container(
+                // this should be replaced by navigation!
+                color: _backgroundColor,
+                child: (0 <= currentIndex && currentIndex < destinations.length)
+                    ? destinations[currentIndex].widget
+                    : const Text('invalid page index'),
+              ),
             ),
-          Expanded(
-            child: Container(
-              // this should be replaced by navigation!
-              color: _backgroundColor,
-              child: (0 <= currentIndex && currentIndex < destinations.length)
-                  ? destinations[currentIndex].widget
-                  : const Text('invalid page index'),
-            ),
-          ),
-        ],
+          ],
+        ),
+        floatingActionButton: doubleRail
+            ? null
+            : AppFloatingActionButton(
+                onPressed: () => topController.create(),
+                child: const Icon(Icons.add),
+              ),
+        bottomNavigationBar: doubleRail
+            ? null
+            : AppBottomNavigationBar(
+                selectedIndex: currentIndex,
+                destinations: destinations,
+                onDestinationSelected: (index) =>
+                    setState(() => currentIndex = index),
+              ),
       ),
-      floatingActionButton: doubleRail
-          ? null
-          : AppFloatingActionButton(
-              onPressed: () => topController.create(),
-              child: const Icon(Icons.add),
-            ),
-      bottomNavigationBar: doubleRail
-          ? null
-          : AppBottomNavigationBar(
-              selectedIndex: currentIndex,
-              destinations: destinations,
-              onDestinationSelected: (index) =>
-                  setState(() => currentIndex = index),
-            ),
     );
   }
 }
