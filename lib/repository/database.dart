@@ -9,25 +9,25 @@ import '../models/models.dart';
 var goalsFixture = StorageRoot.from(
   [
     Goal(name: 'Learn BWV772 ?', goalType: GoalType.learning, tasks: [
-      Task(name: 'LH Reading', estimation: Duration(minutes: 10)),
-      Task(name: 'RH Reading', estimation: Duration(minutes: 10)),
-      Task(name: 'Practice C Scale', estimation: Duration(minutes: 10)),
-      Task(name: 'Practice D Scale', estimation: Duration(minutes: 10)),
-      Task(name: 'Practice A minor Scale', estimation: Duration(minutes: 10)),
-      Task(name: 'Measures 1-4', estimation: Duration(minutes: 10)),
-      Task(name: 'Measures 2-8', estimation: Duration(minutes: 10)),
+      Task(name: 'LH Reading'),
+      Task(name: 'RH Reading'),
+      Task(name: 'Practice C Scale'),
+      Task(name: 'Practice D Scale'),
+      Task(name: 'Practice A minor Scale'),
+      Task(name: 'Measures 1-4'),
+      Task(name: 'Measures 2-8'),
     ]),
     Goal(
         name: 'Read Good Strategy Bad Strategy',
         goalType: GoalType.learning,
         tasks: [
-          Task(name: 'Chapter 1', estimation: Duration(minutes: 15)),
-          Task(name: 'Chapter 2', estimation: Duration(minutes: 15)),
+          Task(name: 'Chapter 1'),
+          Task(name: 'Chapter 2'),
         ]),
     Goal(name: 'Bake a traditional pie', goalType: GoalType.learning, tasks: [
-      Task(name: 'Buy ingredients', estimation: Duration(minutes: 60)),
-      Task(name: 'Mix all together', estimation: Duration(minutes: 15)),
-      Task(name: 'Bake', estimation: Duration(minutes: 30)),
+      Task(name: 'Buy ingredients'),
+      Task(name: 'Mix all together'),
+      Task(name: 'Bake'),
     ]),
   ],
 );
@@ -42,7 +42,7 @@ class AppDatabaseMigrations {
         active INTEGER NOT NULL DEFAULT 1, 
         name TEXT,
         type TEXT,
-        tool TEXT,
+        deadline INTEGER,
         position INTEGER NOT NULL DEFAULT 0
        )
       ''');
@@ -52,7 +52,6 @@ class AppDatabaseMigrations {
         id INTEGER PRIMARY KEY AUTOINCREMENT,         
         active INTEGER NOT NULL DEFAULT 1, 
         name TEXT,
-        estimation INTEGER,
         repeatable INTEGER NOT NULL DEFAULT 0,
         position INTEGER NOT NULL DEFAULT 0,
         goal_id INTEGER NOT NULL REFERENCES ${AppDatabase.goalsTable}
@@ -148,7 +147,7 @@ class AppDatabaseInit {
   static Future<AppDatabase> init() async {
     String dbName = join(await getDatabasesPath(), 'taskchisel.db');
 
-    if (false) // enable to drop the db and rebuild it
+    if (true) // enable to drop the db and rebuild it
       await databaseExists(dbName)
           .then((exists) => exists ? deleteDatabase(dbName) : null);
 

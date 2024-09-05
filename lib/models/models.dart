@@ -8,22 +8,23 @@ class Goal {
     this.name = '',
     this.goalType,
     this.tasks = const [],
+    this.position = 0,
+    this.deadline,
   });
 
   int? id;
   late String name;
   GoalType? goalType;
-  Set<ToolType> tool = {};
   List<Task> tasks = [];
   int position = 0;
+  DateTime? deadline;
 
   Map<String, Object?> toMap() {
-    log(ToolType.values.byName("notes").name);
     return {
       'name': name,
       'type': goalType?.name,
       'position': position,
-      'tool': tool.map((v) => v.name).join(','),
+      'deadline': deadline?.millisecondsSinceEpoch,
     };
   }
 
@@ -34,27 +35,9 @@ class Goal {
     goalType = map['type'] == null
         ? null
         : GoalType.values.byName(map['type'] as String);
-
-    var toolString = map['tool'] as String?;
-
-    tool = {};
-    if (toolString != null) {
-      for (var toolName in toolString.split(',')) {
-        if (toolName == '') {
-          continue;
-        }
-
-        var toolRead;
-        try {
-          toolRead = ToolType.values.byName(toolName);
-        } on ArgumentError {
-          log('invalid tool value "$toolName" from ${ToolType.values}');
-          continue;
-        }
-
-        tool.add(toolRead);
-      }
-    }
+    deadline = map['deadline'] == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(map['deadline'] as int);
   }
 
   @override
@@ -77,13 +60,18 @@ enum GoalType {
 }
 
 class Task {
-  Task({required this.name, this.estimation, this.goalId, this.position = 0});
+  Task({
+    required this.name,
+    this.goalId,
+    this.position = 0,
+    this.repeatable = false,
+    this.status,
+  });
 
   late String name;
 
   int? id;
   int? goalId;
-  Duration? estimation;
   int position = 0;
   bool repeatable = false;
   TaskStatus? status;
@@ -94,7 +82,6 @@ class Task {
       'name': name,
       'position': position,
       'repeatable': repeatable ? 1 : 0,
-      'estimation': estimation?.inSeconds,
     };
   }
 
@@ -104,38 +91,12 @@ class Task {
     name = map['name'] as String;
     position = map['position'] as int;
     repeatable = (map['repeatable'] as int) == 1;
-    var est = map['estimation'] as int?;
-
-    if (est != null) {
-      estimation = Duration(seconds: est!);
-    }
   }
 
   @override
   String toString() {
     return "Task(id=$id, p=$position, goal_id=${goalId}, $name)";
   }
-}
-
-enum ToolType {
-  stopwatch(description: "Stopwatch", icon: Icons.timer),
-  notes(description: "Notes", icon: Icons.note);
-
-  const ToolType({required this.description, required this.icon});
-
-  final IconData icon;
-  final String description;
-}
-
-abstract class Tool {
-  ToolType get toolType;
-}
-
-class StopwatchTool implements Tool {
-  late Stopwatch running = Stopwatch();
-
-  @override
-  ToolType get toolType => ToolType.stopwatch;
 }
 
 enum TaskStatusValue {
@@ -152,6 +113,8 @@ enum TaskStatusValue {
 class TaskStatus {
   TaskStatus({
     required this.taskId,
+    this.startedAt,
+    this.lastRunAt,
   });
 
   late final int taskId;
@@ -181,11 +144,21 @@ class TaskStatus {
         ? TaskStatusValue.ready
         : TaskStatusValue.values.byName(map['status'] as String);
 
-    startedAt = map['started_at'] == null ? null: DateTime.fromMillisecondsSinceEpoch(map['started_at'] as int);
-    lastRunAt = map['last_run_at'] == null ? null: DateTime.fromMillisecondsSinceEpoch(map['last_run_at'] as int);
-    duration = map['duration'] == null ? null: Duration(seconds: map['duration'] as int);
-    timebox = map['timebox'] == null ? null: Duration(seconds: map['timebox'] as int);
-    cooldown = map['cooldown'] == null ? null: Duration(seconds: map['cooldown'] as int);
+    startedAt = map['started_at'] == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(map['started_at'] as int);
+    lastRunAt = map['last_run_at'] == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(map['last_run_at'] as int);
+    duration = map['duration'] == null
+        ? null
+        : Duration(seconds: map['duration'] as int);
+    timebox = map['timebox'] == null
+        ? null
+        : Duration(seconds: map['timebox'] as int);
+    cooldown = map['cooldown'] == null
+        ? null
+        : Duration(seconds: map['cooldown'] as int);
   }
 
   @override

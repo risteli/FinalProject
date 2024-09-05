@@ -94,12 +94,7 @@ class _GoalWizardState extends State<GoalWizard> {
                   controls: wizardControls,
                   onSubmitted: persistGoal,
                 ),
-              3 => GoalSlideTool(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: persistGoal,
-                ),
-              4 => GoalSlideTasks(
+              3 => GoalSlideTasks(
                   goal: goal,
                   controls: wizardControls,
                   onSubmitted: persistGoal,
@@ -206,56 +201,6 @@ class _GoalSlideTypeState extends State<GoalSlideType> {
           onSelectionChanged: (Set<GoalType> values) {
             widget.goal.goalType = values.first;
             log('update for goal type: ${widget.goal.goalType}');
-            widget.onSubmitted();
-          },
-        ),
-        if (widget.controls != null) widget.controls!,
-      ],
-    );
-  }
-}
-
-class GoalSlideTool extends StatefulWidget {
-  const GoalSlideTool({
-    super.key,
-    required this.goal,
-    this.controls,
-    required this.onSubmitted,
-  });
-
-  final Goal goal;
-  final Widget? controls;
-  final void Function() onSubmitted;
-
-  @override
-  State<GoalSlideTool> createState() => _GoalSlideToolState();
-}
-
-class _GoalSlideToolState extends State<GoalSlideTool> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        const Text("Which tools could be useful to progress on your goal?"),
-        SegmentedButton<ToolType>(
-          segments: <ButtonSegment<ToolType>>[
-            ...ToolType.values.map(
-              (toolType) => ButtonSegment<ToolType>(
-                icon: Icon(toolType.icon),
-                label: Text(toolType.description),
-                value: toolType,
-              ),
-            ),
-          ],
-          selected: widget.goal.tool,
-          showSelectedIcon: false,
-          multiSelectionEnabled: true,
-          emptySelectionAllowed: true,
-          onSelectionChanged: (Set<ToolType> values) {
-            widget.goal.tool = values;
-            log('update for tool type: ${widget.goal.tool}');
             widget.onSubmitted();
           },
         ),
