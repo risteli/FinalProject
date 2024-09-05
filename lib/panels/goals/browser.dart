@@ -6,7 +6,6 @@ import '../../models/roots.dart';
 
 import '../../repository/storage.dart';
 import 'goal_tile.dart';
-import '../../widgets/search_bar.dart' as search_bar;
 
 class GoalBrowserView extends StatefulWidget {
   const GoalBrowserView({
@@ -41,7 +40,7 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
             style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
           ),
           const SizedBox(height: 8),
-          GoalBrowserList(
+          _GoalBrowserList(
             onSelected: widget.onSelected,
             onUpdatedGoals: () => storage.updateGoals(),
             selectedIndex: widget.selectedIndex,
@@ -52,8 +51,8 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
   }
 }
 
-class GoalBrowserList extends StatefulWidget {
-  const GoalBrowserList({
+class _GoalBrowserList extends StatefulWidget {
+  const _GoalBrowserList({
     super.key,
     required this.onSelected,
     required this.onUpdatedGoals,
@@ -65,10 +64,10 @@ class GoalBrowserList extends StatefulWidget {
   final int? selectedIndex;
 
   @override
-  State<GoalBrowserList> createState() => _GoalBrowserListState();
+  State<_GoalBrowserList> createState() => _GoalBrowserListState();
 }
 
-class _GoalBrowserListState extends State<GoalBrowserList> {
+class _GoalBrowserListState extends State<_GoalBrowserList> {
   @override
   Widget build(BuildContext context) {
     late StorageRoot storageRoot = Provider.of<StorageRoot>(context);

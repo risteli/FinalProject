@@ -51,7 +51,6 @@ class _AppState extends State<App> {
       label: 'Achievements',
       widget: Text('Achiev placeholder'),
     ),
-//    Destination(icon: Icons.settings_outlined, label: 'Settings', widget: Text('Run placeholder'),),
   ];
 
   int currentIndex = 0;

@@ -59,13 +59,13 @@ class _GoalWizardState extends State<GoalWizard> {
                     const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                 child: Form(
                   key: _formKey,
-                  child: GoalSlideName(
+                  child: _GoalSlideName(
                     goal: goal,
                     onSubmitted: persistGoal,
                   ),
                 ),
               ),
-            2 => GoalSlideTasks(goal: goal),
+            2 => _GoalSlideTasks(goal: goal),
             _ => const Text('invalid state'),
           },
           const Expanded(
@@ -114,8 +114,8 @@ class _GoalWizardState extends State<GoalWizard> {
   }
 }
 
-class GoalSlideName extends StatefulWidget {
-  const GoalSlideName({
+class _GoalSlideName extends StatefulWidget {
+  const _GoalSlideName({
     super.key,
     required this.goal,
     required this.onSubmitted,
@@ -125,10 +125,10 @@ class GoalSlideName extends StatefulWidget {
   final void Function() onSubmitted;
 
   @override
-  State<GoalSlideName> createState() => _GoalSlideNameState();
+  State<_GoalSlideName> createState() => _GoalSlideNameState();
 }
 
-class _GoalSlideNameState extends State<GoalSlideName> {
+class _GoalSlideNameState extends State<_GoalSlideName> {
   final nameController = TextEditingController();
   final deadlineController = TextEditingController();
   late final _colorScheme = Theme.of(context).colorScheme;
@@ -248,8 +248,8 @@ class _GoalSlideNameState extends State<GoalSlideName> {
   }
 }
 
-class GoalSlideTasks extends StatefulWidget {
-  const GoalSlideTasks({
+class _GoalSlideTasks extends StatefulWidget {
+  const _GoalSlideTasks({
     super.key,
     required this.goal,
   });
@@ -257,10 +257,10 @@ class GoalSlideTasks extends StatefulWidget {
   final Goal goal;
 
   @override
-  State<GoalSlideTasks> createState() => _GoalSlideTasksState();
+  State<_GoalSlideTasks> createState() => _GoalSlideTasksState();
 }
 
-class _GoalSlideTasksState extends State<GoalSlideTasks> {
+class _GoalSlideTasksState extends State<_GoalSlideTasks> {
   late final _colorScheme = Theme.of(context).colorScheme;
 
   @override

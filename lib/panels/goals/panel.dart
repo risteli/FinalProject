@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../models/roots.dart';
-import '../../routes.dart';
 import '../../top.dart';
 import '../../widgets/app_panels.dart';
 import 'browser.dart';
@@ -55,7 +54,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
       selectedIndex = storageRoot.goalsLength - 1;
     }
 
-    log('building _EditGoalsState ${selectedIndex}');
     return AppPanels(
       singleLayout: selectedIndex == null
           ? GoalBrowserView(
@@ -63,7 +61,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
               onSelected: (context, newSelectedIndex) {
                 setState(() {
                   selectedIndex = newSelectedIndex;
-                  log('selected ${selectedIndex}');
                 });
               },
             )
@@ -74,7 +71,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
               onDone: () => setState(
                 () {
                   selectedIndex = null;
-                  log('selected ${selectedIndex}');
                 },
               ),
             ),
@@ -83,7 +79,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
         onSelected: (context, newSelectedIndex) {
           setState(() {
             selectedIndex = newSelectedIndex;
-            log('selected ${selectedIndex}');
           });
         },
       ),
@@ -93,7 +88,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
         onDone: () => setState(
               () {
             selectedIndex = null;
-            log('selected ${selectedIndex}');
           },
         ),
       ),

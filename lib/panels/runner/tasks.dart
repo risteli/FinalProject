@@ -2,12 +2,8 @@ import 'dart:developer';
 
 import 'package:final_project/panels/runner/tasks_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
-import '../../models/roots.dart';
-import '../../widgets/app_panels.dart';
 
 class GoalsRunnerTasks extends StatefulWidget {
   const GoalsRunnerTasks({
@@ -26,8 +22,6 @@ class GoalsRunnerTasks extends StatefulWidget {
 class _GoalsRunnerTasksState extends State<GoalsRunnerTasks> {
   @override
   Widget build(BuildContext context) {
-    log('building _GoalBrowserViewState ${widget.goal}');
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.goal.name),
@@ -36,7 +30,7 @@ class _GoalsRunnerTasksState extends State<GoalsRunnerTasks> {
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: ListView(
           children: [
-            GoalsRunnerTasksList(
+            _GoalsRunnerTasksList(
               goal: widget.goal,
               onSelected: widget.onSelected,
             ),
@@ -47,8 +41,8 @@ class _GoalsRunnerTasksState extends State<GoalsRunnerTasks> {
   }
 }
 
-class GoalsRunnerTasksList extends StatefulWidget {
-  const GoalsRunnerTasksList({
+class _GoalsRunnerTasksList extends StatefulWidget {
+  const _GoalsRunnerTasksList({
     super.key,
     required this.goal,
     required this.onSelected,
@@ -58,17 +52,15 @@ class GoalsRunnerTasksList extends StatefulWidget {
   final Function(Task) onSelected;
 
   @override
-  State<GoalsRunnerTasksList> createState() => _GoalsRunnerTasksListState();
+  State<_GoalsRunnerTasksList> createState() => _GoalsRunnerTasksListState();
 }
 
-class _GoalsRunnerTasksListState extends State<GoalsRunnerTasksList> {
+class _GoalsRunnerTasksListState extends State<_GoalsRunnerTasksList> {
   int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     var tasks = widget.goal.tasks;
-    log('building GoalsRunnerTasksListState ${tasks}');
-
     return ListView(
       shrinkWrap: true,
       children: List.generate(

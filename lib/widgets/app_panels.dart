@@ -39,10 +39,7 @@ class _AppListDetail extends State<AppPanels> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     mediaWidth = MediaQuery.of(context).size.width.toInt();
-
-    log('orientation set to $mediaWidth');
   }
 
   @override

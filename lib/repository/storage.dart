@@ -93,8 +93,6 @@ class Storage {
   }
 
   Future updateGoals() async {
-    log('now updating');
-
     var batch = db.batch();
     for (var i = 0; i < root.goals.length; i++) {
       var goal = root.goals[i];
@@ -105,16 +103,10 @@ class Storage {
         record['id'] = goal.id;
       }
 
-      log('now inserting or updating $goal ${goal.toMap()}');
       batch.insert(AppDatabase.goalsTable, record,
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
     var ids = await batch.commit();
-
-    if (true) // TODO REMOVE THIS
-      for (var i = 0; i < root.goals.length; i++) {
-        log('id of $i is ${ids[i]} and was ${root.goals[i].id}');
-      }
 
     var idsPlaceholders = List.filled(ids.length, '?').join(',');
 
@@ -127,8 +119,6 @@ class Storage {
   }
 
   Future updateTasks(Goal goal) async {
-    log('now updating $goal ${goal.toMap()}');
-
     var batch = db.batch();
     var tasks = goal.tasks;
 
@@ -141,16 +131,11 @@ class Storage {
         record['id'] = task.id;
       }
 
-      log('now inserting or updating $task ${task.toMap()}');
       batch.insert(AppDatabase.tasksTable, record,
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
 
     var ids = await batch.commit();
-    if (false) // TODO REMOVE THIS
-      for (var i = 0; i < tasks.length; i++) {
-        log('id of $i is ${ids[i]} and was ${tasks[i].id}');
-      }
 
     var idsPlaceholders = List.filled(ids.length, '?').join(',');
 
@@ -163,25 +148,20 @@ class Storage {
   }
 
   Future updateTask(Task task) async {
-    log('now updating $task ${task.toMap()}');
     await db.update(AppDatabase.tasksTable, task.toMap(),
         where: 'id=?', whereArgs: [task.id]);
   }
 
   Future createTask(Task task) async {
-    log('now creating $task ${task.toMap()}');
     task.id = await db.insert(AppDatabase.tasksTable, task.toMap());
-    log('created $task');
   }
 
   Future updateTaskStatus(TaskStatus taskStatus) async {
-    log('now updating $taskStatus ${taskStatus.toMap()}');
     await db.insert(AppDatabase.taskStatusTable, taskStatus.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future addTaskToHistory(TaskStatus taskStatus) async {
-    log('now adding $taskStatus ${taskStatus.toMap()} to history');
     await db.insert(AppDatabase.taskHistoryTable, taskStatus.toMap());
   }
 }

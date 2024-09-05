@@ -62,7 +62,7 @@ class _GoalTileState extends State<GoalTile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              GoalContent(
+              _GoalContent(
                 goal: widget.goal,
                 isSelected: widget.isSelected,
               ),
@@ -74,8 +74,8 @@ class _GoalTileState extends State<GoalTile> {
   }
 }
 
-class GoalContent extends StatefulWidget {
-  const GoalContent({
+class _GoalContent extends StatefulWidget {
+  const _GoalContent({
     super.key,
     required this.goal,
     this.isSelected = false,
@@ -85,10 +85,10 @@ class GoalContent extends StatefulWidget {
   final bool isSelected;
 
   @override
-  State<GoalContent> createState() => _GoalContentState();
+  State<_GoalContent> createState() => _GoalContentState();
 }
 
-class _GoalContentState extends State<GoalContent> {
+class _GoalContentState extends State<_GoalContent> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late final TextTheme _textTheme = Theme.of(context).textTheme;
   late final textStyle = widget.isSelected

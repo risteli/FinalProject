@@ -3,34 +3,7 @@ import 'dart:developer';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/roots.dart';
-import '../models/models.dart';
-
-var goalsFixture = StorageRoot.from(
-  [
-    Goal(name: 'Learn BWV772 ?', goalType: GoalType.learning, tasks: [
-      Task(name: 'LH Reading'),
-      Task(name: 'RH Reading'),
-      Task(name: 'Practice C Scale'),
-      Task(name: 'Practice D Scale'),
-      Task(name: 'Practice A minor Scale'),
-      Task(name: 'Measures 1-4'),
-      Task(name: 'Measures 2-8'),
-    ]),
-    Goal(
-        name: 'Read Good Strategy Bad Strategy',
-        goalType: GoalType.learning,
-        tasks: [
-          Task(name: 'Chapter 1'),
-          Task(name: 'Chapter 2'),
-        ]),
-    Goal(name: 'Bake a traditional pie', goalType: GoalType.learning, tasks: [
-      Task(name: 'Buy ingredients'),
-      Task(name: 'Mix all together'),
-      Task(name: 'Bake'),
-    ]),
-  ],
-);
+import 'fixture.dart';
 
 class AppDatabaseMigrations {
   void v1up(Database db) async {
@@ -132,10 +105,6 @@ class AppDatabaseMigrations {
         goal.tasks[j].id = ids[j] as int;
       }
     }
-
-    goalsFixture.goals.forEach((goal) {
-      log('now $goal');
-    });
   }
 }
 
@@ -147,7 +116,7 @@ class AppDatabaseInit {
   static Future<AppDatabase> init() async {
     String dbName = join(await getDatabasesPath(), 'taskchisel.db');
 
-    if (true) // enable to drop the db and rebuild it
+    if (false) // enable to drop the db and rebuild it from the fixture. There are better ways to do this.
       await databaseExists(dbName)
           .then((exists) => exists ? deleteDatabase(dbName) : null);
 
@@ -173,7 +142,10 @@ class AppDatabaseInit {
     log('migrate to $version');
     _migrations.v1up(db);
 
+    log('loading dev fixtures');
     _migrations.addFixture(db);
+
+    log('migrations completed');
   }
 }
 

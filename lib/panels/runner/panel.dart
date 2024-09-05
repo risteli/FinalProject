@@ -1,11 +1,10 @@
 import 'dart:developer';
 
+import 'package:final_project/panels/runner/task_runner.dart';
 import 'package:final_project/panels/runner/browser.dart';
-import 'package:final_project/panels/runner/goals.dart';
 import 'package:final_project/panels/runner/tasks.dart';
 import 'package:final_project/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
@@ -59,21 +58,18 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
 
   @override
   Widget build(BuildContext context) {
-    log('building RunnableGoalsState');
-
     return Consumer<StorageRoot>(
       builder: (context, storageRoot, _) {
         routeToRunner(task) => widget.navigationStateKey.currentState!
             .pushNamed(routeRunTask, arguments: task);
 
         return AppPanels(
-          singleLayout: GoalsRunnerGoals(
+          singleLayout: GoalsRunnerBrowser(
             storageRoot: storageRoot,
             selectedIndex: selectedIndex,
             onSelected: (context, newSelectedIndex) {
               setState(() {
                 selectedIndex = newSelectedIndex;
-                log('selected $selectedIndex');
               });
               Navigator.push(
                 context,
@@ -88,13 +84,12 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
               );
             },
           ),
-          doubleLayoutLeft: GoalsRunnerGoals(
+          doubleLayoutLeft: GoalsRunnerBrowser(
             storageRoot: storageRoot,
             selectedIndex: selectedIndex,
             onSelected: (context, newSelectedIndex) {
               setState(() {
                 selectedIndex = newSelectedIndex;
-                log('selected $selectedIndex');
               });
             },
           ),

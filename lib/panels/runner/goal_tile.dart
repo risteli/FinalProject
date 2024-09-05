@@ -36,7 +36,6 @@ class _GoalsRunnerGoalTileState extends State<GoalsRunnerGoalTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-          log('tap ${widget.goal}');
           widget.onSelected();
       },
       child: Card(
