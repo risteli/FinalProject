@@ -59,7 +59,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
     return AppPanels(
       singleLayout: selectedIndex == null
           ? GoalBrowserView(
-              storageRoot: storageRoot,
               selectedIndex: selectedIndex,
               onSelected: (context, newSelectedIndex) {
                 setState(() {
@@ -80,7 +79,6 @@ class _GoalsPanelState extends State<GoalsPanel> {
               ),
             ),
       doubleLayoutLeft: GoalBrowserView(
-        storageRoot: storageRoot,
         selectedIndex: selectedIndex,
         onSelected: (context, newSelectedIndex) {
           setState(() {
