@@ -73,8 +73,6 @@ class _GoalBrowserListState extends State<GoalBrowserList> {
   Widget build(BuildContext context) {
     late StorageRoot storageRoot = Provider.of<StorageRoot>(context);
 
-    log('building GoalBrowserList ${storageRoot.goals} ${widget.selectedIndex}');
-
     return ReorderableListView(
       shrinkWrap: true,
       onReorder: (int oldIndex, int newIndex) {
@@ -95,7 +93,7 @@ class _GoalBrowserListState extends State<GoalBrowserList> {
               onSelected: () => widget.onSelected(context, index),
               onDelete: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Goal "${goal.name}" dismissed')));
+                    SnackBar(content: Text('Goal "${goal.name}" removed.')));
                 setState(() {
                   storageRoot.deleteGoalAt(index);
                   widget.onUpdatedGoals();

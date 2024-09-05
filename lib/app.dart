@@ -76,7 +76,6 @@ class _AppState extends State<App> {
                 ),
               Expanded(
                 child: Container(
-                  // this should be replaced by navigation!
                   color: _backgroundColor,
                   child: (0 <= currentIndex && currentIndex < destinations.length)
                       ? destinations[currentIndex].widget

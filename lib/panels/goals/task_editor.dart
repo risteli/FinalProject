@@ -30,10 +30,10 @@ class _TaskListState extends State<TaskList> {
   Widget build(BuildContext context) {
     final tasks = widget.goal.tasks;
 
-    return Expanded(
+    return Scrollbar(
+      thumbVisibility: true,
       child: ReorderableListView(
         onReorder: (int oldIndex, int newIndex) {
-          log('reorder $oldIndex to $newIndex');
           setState(() => tasks.insert(newIndex, tasks.removeAt(oldIndex)));
           Storage.instance.updateTasks(widget.goal);
         },
@@ -45,7 +45,7 @@ class _TaskListState extends State<TaskList> {
               task: task,
               onDelete: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Task "${task.name}" dismissed')));
+                    SnackBar(content: Text('Task "${task.name}" removed')));
                 setState(() {
                   widget.goal.tasks.remove(task);
                   Storage.instance.updateTasks(widget.goal);

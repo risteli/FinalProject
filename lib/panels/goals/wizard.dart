@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:final_project/repository/storage.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../../models/roots.dart';
 import '../../models/models.dart';
@@ -14,13 +14,11 @@ class GoalWizard extends StatefulWidget {
     required this.storageRoot,
     this.goalIndex,
     this.appbar = false,
-    this.step = 1,
     required this.onDone,
   });
 
   final StorageRoot storageRoot;
   final int? goalIndex;
-  int step;
   final bool appbar;
   final Function() onDone;
 
@@ -32,7 +30,9 @@ class _GoalWizardState extends State<GoalWizard> {
   late final _colorScheme = Theme.of(context).colorScheme;
   late final _backgroundColor = Color.alphaBlend(
       _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
+  static const TextStyle navButtonTextStyle = TextStyle(fontSize: 20);
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  int step = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -42,67 +42,73 @@ class _GoalWizardState extends State<GoalWizard> {
 
     final goal = widget.storageRoot.goals[widget.goalIndex!];
 
-    log('GoalWizard ${widget.storageRoot.goals} step ${widget.step}');
-
     void persistGoal() {
       widget.storageRoot.updateGoalAt(widget.goalIndex!, goal);
       Storage.instance.updateGoals();
     }
 
-    Widget wizardControls = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        if (widget.step > 1)
-          ElevatedButton(
-            onPressed: () => setState(() => widget.step--),
-            child: const Text('prev'),
-          ),
-        if (widget.step < 4)
-          ElevatedButton(
-            onPressed: () => setState(() => widget.step++),
-            child: const Text('next'),
-            //style: ElevatedButton.styleFrom(backgroundColor: _colorScheme.secondary, textStyle: TextStyle(color: _colorScheme.surface)),
-          ),
-        if (widget.step == 4)
-          ElevatedButton(
-            onPressed: () => widget.onDone(),
-            child: const Text('done'),
-          ),
-      ],
-    );
-
-    return Scaffold(
-      backgroundColor: _backgroundColor,
-      appBar: widget.appbar?AppBar(
-        backgroundColor: _backgroundColor,
-        title: const Text('Here you can define your goal'),
-      ):null,
-      body: Card(
-        color: _backgroundColor,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-          child: Form(
-            key: _formKey,
-            child: switch (widget.step) {
-              1 => GoalSlideName(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: persistGoal,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          switch (step) {
+            1 => Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                child: Form(
+                  key: _formKey,
+                  child: GoalSlideName(
+                    goal: goal,
+                    onSubmitted: persistGoal,
+                  ),
                 ),
-              2 => GoalSlideType(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: persistGoal,
-                ),
-              3 => GoalSlideTasks(
-                  goal: goal,
-                  controls: wizardControls,
-                  onSubmitted: persistGoal,
-                ),
-              _ => const Text('invalid state'),
-            },
+              ),
+            2 => GoalSlideTasks(goal: goal),
+            _ => const Text('invalid state'),
+          },
+          const Expanded(
+            child: SizedBox(
+              height: double.infinity,
+            ),
           ),
-        ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (step == 1)
+                    ElevatedButton(
+                      onPressed: () => setState(() => step = 2),
+                      child: const Text(
+                        'Split this goal into tasks.',
+                        style: navButtonTextStyle,
+                      ),
+                    ),
+                  if (step == 2)
+                    ElevatedButton(
+                      onPressed: () => setState(() => step = 1),
+                      child: const Text(
+                        'Describe your goal.',
+                        style: navButtonTextStyle,
+                      ),
+                      //style: ElevatedButton.styleFrom(backgroundColor: _colorScheme.secondary, textStyle: TextStyle(color: _colorScheme.surface)),
+                    ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () => widget.onDone(),
+                    child: const Text(
+                      'Done!',
+                      style: navButtonTextStyle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -112,12 +118,10 @@ class GoalSlideName extends StatefulWidget {
   const GoalSlideName({
     super.key,
     required this.goal,
-    this.controls,
     required this.onSubmitted,
   });
 
   final Goal goal;
-  final Widget? controls;
   final void Function() onSubmitted;
 
   @override
@@ -126,6 +130,10 @@ class GoalSlideName extends StatefulWidget {
 
 class _GoalSlideNameState extends State<GoalSlideName> {
   final nameController = TextEditingController();
+  final deadlineController = TextEditingController();
+  late final _colorScheme = Theme.of(context).colorScheme;
+  late final _backgroundColor = Color.alphaBlend(
+      _colorScheme.primary.withOpacity(0.14), _colorScheme.surface);
 
   @override
   void dispose() {
@@ -133,58 +141,67 @@ class _GoalSlideNameState extends State<GoalSlideName> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    log('now slide name ${widget.goal.name}');
-    nameController.text = widget.goal.name ?? "";
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        const Text("What do you want to accomplish?"),
-        TextField(
-            controller: nameController,
-            onSubmitted: (value) {
-              widget.goal.name = value;
-              log('update for goal name: ${widget.goal.name}');
-              widget.onSubmitted();
-            }),
-        if (widget.controls != null) widget.controls!,
-      ],
+  Future<DateTime?> _pickDate(BuildContext context) async {
+    return await showDatePicker(
+      context: context,
+      initialDate: widget.goal.deadline,
+      firstDate: DateTime(2024, 7, 1),
+      lastDate: DateTime(2099, 12, 31),
     );
   }
-}
 
-class GoalSlideType extends StatefulWidget {
-  const GoalSlideType({
-    super.key,
-    required this.goal,
-    this.controls,
-    required this.onSubmitted,
-  });
-
-  final Goal goal;
-  final Widget? controls;
-  final void Function() onSubmitted;
-
-  @override
-  State<GoalSlideType> createState() => _GoalSlideTypeState();
-}
-
-class _GoalSlideTypeState extends State<GoalSlideType> {
   @override
   Widget build(BuildContext context) {
+    nameController.text = widget.goal.name ?? "";
     final goalTypeSet = <GoalType>{};
     if (widget.goal.goalType != null) {
       goalTypeSet.add(widget.goal.goalType!);
     }
+    deadlineController.text = DateFormat.yMMMEd().format(widget.goal.deadline!) ?? "";
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Text("What best describes your goal?"),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Text(
+            "Describe your goal.",
+            style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Text(
+            "Start planning your goals, task by task.",
+            style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
+          ),
+        ),
+        const SizedBox(height: 8),
+        const SizedBox(
+          height: 10,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 12.0),
+          child: Text('What do you want to accomplish?'),
+        ),
+        TextField(
+          controller: nameController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+          onSubmitted: (value) {
+            widget.goal.name = value;
+            widget.onSubmitted();
+          },
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 12.0),
+          child: Text('What best describes your goal?'),
+        ),
         SegmentedButton<GoalType>(
           segments: <ButtonSegment<GoalType>>[
             ...GoalType.values.map(
@@ -200,11 +217,32 @@ class _GoalSlideTypeState extends State<GoalSlideType> {
           emptySelectionAllowed: true,
           onSelectionChanged: (Set<GoalType> values) {
             widget.goal.goalType = values.first;
-            log('update for goal type: ${widget.goal.goalType}');
             widget.onSubmitted();
           },
         ),
-        if (widget.controls != null) widget.controls!,
+        const SizedBox(
+          height: 20,
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 12.0),
+          child: Text('Is there a deadline for this goal?'),
+        ),
+        TextField(
+          controller: deadlineController,
+          readOnly: true,
+          onTap: () => _pickDate(context).then((deadline) {
+            setState(() {
+              widget.goal.deadline = deadline;
+              widget.onSubmitted();
+            });
+          }),
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
       ],
     );
   }
@@ -214,29 +252,43 @@ class GoalSlideTasks extends StatefulWidget {
   const GoalSlideTasks({
     super.key,
     required this.goal,
-    this.controls,
-    required this.onSubmitted,
   });
 
   final Goal goal;
-  final Widget? controls;
-  final void Function() onSubmitted;
 
   @override
   State<GoalSlideTasks> createState() => _GoalSlideTasksState();
 }
 
 class _GoalSlideTasksState extends State<GoalSlideTasks> {
+  late final _colorScheme = Theme.of(context).colorScheme;
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        const Text("List the tasks needed to accomplish your goal:"),
-        TaskList(goal: widget.goal),
-        if (widget.controls != null) widget.controls!,
-      ],
+    return Expanded(
+      flex: 1000,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Text(
+              "The tasks of this goal",
+              style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Text(
+              "Split this goal into tasks, make it simple!",
+              style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
+            ),
+          ),
+          Expanded(
+            child: TaskList(goal: widget.goal),
+          ),
+        ],
+      ),
     );
   }
 }

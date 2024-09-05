@@ -1,8 +1,7 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import '../../models/models.dart';
 
 class GoalTile extends StatefulWidget {
@@ -93,10 +92,9 @@ class _GoalContentState extends State<GoalContent> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late final TextTheme _textTheme = Theme.of(context).textTheme;
   late final textStyle = widget.isSelected
-      ? _textTheme.labelMedium?.copyWith(
-      color: _colorScheme.onSecondaryContainer)
-      : _textTheme.labelMedium
-      ?.copyWith(color: _colorScheme.onSurface);
+      ? _textTheme.labelMedium
+          ?.copyWith(color: _colorScheme.onSecondaryContainer)
+      : _textTheme.labelMedium?.copyWith(color: _colorScheme.onSurface);
 
   @override
   Widget build(BuildContext context) {
@@ -138,10 +136,10 @@ class _GoalContentState extends State<GoalContent> {
                       style: textStyle?.copyWith(fontSize: 16.0),
                     ),
                     if (widget.goal.deadline != null)
-                    Text(
-                      'Deadline for this task is ${widget.goal.deadline}',
-                      style: textStyle,
-                    ),
+                      Text(
+                        'Deadline for this task: ${DateFormat.yMMMEd().format(widget.goal.deadline!)}',
+                        style: textStyle,
+                      ),
                   ],
                 ),
               ),
