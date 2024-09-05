@@ -26,14 +26,14 @@ class _AppFloatingActionButton extends State<AppFloatingActionButton> {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       elevation: widget.elevation,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(30),
         ),
       ),
 
-      backgroundColor: _colorScheme.tertiaryContainer,
-      foregroundColor: _colorScheme.onTertiaryContainer,
+      backgroundColor: _colorScheme.secondaryContainer,
+      foregroundColor: _colorScheme.onSecondaryContainer,
       onPressed: widget.onPressed,
       child: widget.child,
     );

@@ -41,7 +41,7 @@ class _AppNavigationRailState extends State<AppNavigationRail> {
           ),
         ],
       ),
-      groupAlignment: -0.8,
+      groupAlignment: -0.3,
       destinations: widget.destinations.map((d) {
         return NavigationRailDestination(
           icon: Icon(d.icon),

@@ -29,29 +29,24 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 32.0),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: ListView(
-            children: [
-              Text(
-                "Your goals",
-                style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
-              ),
-              Text(
-                "Start planning your goals, task by task.",
-                style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
-              ),
-              const SizedBox(height: 8),
-              GoalBrowserList(
-                onSelected: widget.onSelected,
-                onUpdatedGoals: () => storage.updateGoals(),
-                selectedIndex: widget.selectedIndex,
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ListView(
+        children: [
+          Text(
+            "Your goals",
+            style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
           ),
-        ),
+          Text(
+            "Start planning your goals, task by task.",
+            style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
+          ),
+          const SizedBox(height: 8),
+          GoalBrowserList(
+            onSelected: widget.onSelected,
+            onUpdatedGoals: () => storage.updateGoals(),
+            selectedIndex: widget.selectedIndex,
+          ),
+        ],
       ),
     );
   }

@@ -62,27 +62,29 @@ class _AppState extends State<App> {
 
     return StorageAsyncLoader(
       child: Scaffold(
-        body: Row(
-          children: [
-            if (doubleRail)
-              AppNavigationRail(
-                selectedIndex: currentIndex,
-                backgroundColor: _backgroundColor,
-                destinations: destinations,
-                onDestinationSelected: (index) =>
-                    setState(() => currentIndex = index),
-                onCreateButtonPressed: () => topController.create(),
+        body: SafeArea(
+          child: Row(
+            children: [
+              if (doubleRail)
+                AppNavigationRail(
+                  selectedIndex: currentIndex,
+                  backgroundColor: _backgroundColor,
+                  destinations: destinations,
+                  onDestinationSelected: (index) =>
+                      setState(() => currentIndex = index),
+                  onCreateButtonPressed: () => topController.create(),
+                ),
+              Expanded(
+                child: Container(
+                  // this should be replaced by navigation!
+                  color: _backgroundColor,
+                  child: (0 <= currentIndex && currentIndex < destinations.length)
+                      ? destinations[currentIndex].widget
+                      : const Text('invalid page index'),
+                ),
               ),
-            Expanded(
-              child: Container(
-                // this should be replaced by navigation!
-                color: _backgroundColor,
-                child: (0 <= currentIndex && currentIndex < destinations.length)
-                    ? destinations[currentIndex].widget
-                    : const Text('invalid page index'),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         floatingActionButton: doubleRail
             ? null
