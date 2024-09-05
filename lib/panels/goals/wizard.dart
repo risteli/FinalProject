@@ -157,7 +157,7 @@ class _GoalSlideNameState extends State<_GoalSlideName> {
     if (widget.goal.goalType != null) {
       goalTypeSet.add(widget.goal.goalType!);
     }
-    deadlineController.text = DateFormat.yMMMEd().format(widget.goal.deadline!) ?? "";
+    deadlineController.text = widget.goal.deadline == null ? "": DateFormat.yMMMEd().format(widget.goal.deadline!);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

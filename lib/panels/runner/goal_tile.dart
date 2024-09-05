@@ -98,9 +98,6 @@ class _TileContentState extends State<_TileContent> {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (constraints.maxWidth - 200 > 0) ...[
-                  const Padding(padding: EdgeInsets.symmetric(horizontal: 6.0)),
-                ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
