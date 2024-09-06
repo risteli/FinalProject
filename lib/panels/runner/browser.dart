@@ -24,6 +24,7 @@ class GoalsRunnerBrowser extends StatefulWidget {
 }
 
 class _GoalsRunnerBrowserState extends State<GoalsRunnerBrowser> {
+  late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   final storage = Storage();
 
   @override
@@ -32,6 +33,22 @@ class _GoalsRunnerBrowserState extends State<GoalsRunnerBrowser> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ListView(
         children: [
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "Time for action!",
+              style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "Which goal do you want to work on?",
+              style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
+            ),
+          ),
+          const SizedBox(height: 8),
           _GoalsRunnerGoalsList(
             storageRoot: widget.storageRoot,
             onSelected: widget.onSelected,
@@ -68,6 +85,7 @@ class _GoalsRunnerGoalsListState extends State<_GoalsRunnerGoalsList> {
         widget.storageRoot.goals.length,
         (index) {
           var goal = widget.storageRoot.goals[index];
+
           return Padding(
             key: Key('goal-${index}'),
             padding: const EdgeInsets.only(bottom: 8.0),

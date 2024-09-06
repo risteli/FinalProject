@@ -106,21 +106,11 @@ class _GoalContentState extends State<_GoalContent> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    value: 1 / 6,
-                    color: _colorScheme.primary.withOpacity(0.80),
-                    backgroundColor: _colorScheme.primary.withOpacity(0.40),
-                  ),
-                  Center(
-                    child: Icon(
-                      widget.goal.goalType?.icon,
-                      color: _colorScheme.primary,
-                    ),
-                  ),
-                ],
+              Center(
+                child: Icon(
+                  widget.goal.goalType?.icon,
+                  color: _colorScheme.primary,
+                ),
               ),
               const SizedBox(
                 width: 12.0,

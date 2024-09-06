@@ -72,19 +72,6 @@ class _TileContentState extends State<_TileContent> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late final TextTheme _textTheme = Theme.of(context).textTheme;
 
-  Widget get contentSpacer => SizedBox(height: 2);
-
-  String get activeTasksCounterLabel {
-    return '';
-  }
-
-  TextStyle? get contentTextStyle => switch (widget) {
-        _TileContent(isSelected: true) => _textTheme.bodyMedium
-            ?.copyWith(color: _colorScheme.onPrimaryContainer),
-        _ =>
-          _textTheme.bodyMedium?.copyWith(color: _colorScheme.onSurfaceVariant),
-      };
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -96,9 +83,27 @@ class _TileContentState extends State<_TileContent> {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (constraints.maxWidth - 200 > 0) ...[
-                  const Padding(padding: EdgeInsets.symmetric(horizontal: 6.0)),
-                ],
+                Center(
+                  child: switch (widget.task.status?.status) {
+                    TaskStatusValue.done => Icon(
+                        Icons.done,
+                        color: _colorScheme.primary,
+                      ),
+                    TaskStatusValue.stopped => Icon(
+                      Icons.stop,
+                      color: _colorScheme.primary,
+                    ),
+                    TaskStatusValue.ready => Icon(
+                      Icons.not_started,
+                      color: _colorScheme.primary,
+                    ),
+                    _ => Icon(
+                      Icons.question_mark,
+                      color: _colorScheme.primary,
+                    ),
+                  },
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,19 +114,9 @@ class _TileContentState extends State<_TileContent> {
                         maxLines: 1,
                         style: widget.isSelected
                             ? _textTheme.labelMedium?.copyWith(
-                                color: _colorScheme.onSecondaryContainer)
+                                color: _colorScheme.onSecondaryContainer, fontSize: 16)
                             : _textTheme.labelMedium
-                                ?.copyWith(color: _colorScheme.onSurface),
-                      ),
-                      Text(
-                        activeTasksCounterLabel,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        style: widget.isSelected
-                            ? _textTheme.labelMedium?.copyWith(
-                                color: _colorScheme.onSecondaryContainer)
-                            : _textTheme.labelMedium?.copyWith(
-                                color: _colorScheme.onSurfaceVariant),
+                                ?.copyWith(color: _colorScheme.onSurface, fontSize: 16),
                       ),
                     ],
                   ),

@@ -84,4 +84,8 @@ class StorageRoot extends ChangeNotifier {
     _goals.clear();
     notifyListeners();
   }
+
+  void updated() {
+    notifyListeners();
+  }
 }

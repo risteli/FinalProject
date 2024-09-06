@@ -40,6 +40,35 @@ class Goal {
         : DateTime.fromMillisecondsSinceEpoch(map['deadline'] as int);
   }
 
+  Map<TaskStatusValue, int> countTasksByStatus() {
+    Map<TaskStatusValue, int> count = {};
+    for (var statusValue in TaskStatusValue.values) {
+      count[statusValue] = 0;
+    }
+
+    for (var task in tasks) {
+      if (task.status != null) {
+        count[task.status!.status] = count[task.status!.status]! + 1;
+      }
+    }
+
+    return count;
+  }
+
+  DateTime? get lastRunAt {
+    DateTime? last;
+
+    for (var task in tasks) {
+      if (task.status?.lastRunAt != null) {
+        if (last == null || last.isBefore(task.status!.lastRunAt!)) {
+          last = task.status!.lastRunAt!;
+        }
+      }
+    }
+
+    return last;
+  }
+
   @override
   String toString() {
     String tasksList = tasks.join(',');

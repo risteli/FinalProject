@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:final_project/repository/storage.dart';
@@ -7,6 +8,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../models/roots.dart';
+
+var timeFormatter = (Duration d) =>
+    "${d.inMinutes.toString().padLeft(2, '0')}:${d.inSeconds.remainder(60).toString().padLeft(2, '0')}";
 
 class RunTask extends StatefulWidget {
   const RunTask({
@@ -34,20 +38,29 @@ class _RunTaskState extends State<RunTask> {
     runController.resume();
   }
 
-  void stop() {
+  void _stop() {
     taskStatus.status = TaskStatusValue.stopped;
     if (taskStatus.startedAt != null) {
       taskStatus.duration = (taskStatus.duration ?? const Duration()) +
           DateTime.now().difference(taskStatus.lastRunAt!);
     }
+  }
 
+  void stop() {
+    _stop();
     Storage.instance.updateTaskStatus(taskStatus);
     runController.pause();
   }
 
   void done() {
     if (taskStatus.status == TaskStatusValue.started) {
-      stop();
+      _stop();
+      runController.pause();
+    } else if (taskStatus.status == TaskStatusValue.ready) {
+      // simpler case: task is marked as done
+      taskStatus.startedAt ??= DateTime.now();
+      taskStatus.lastRunAt = DateTime.now();
+      taskStatus.duration ??= const Duration();
     }
 
     taskStatus.status = TaskStatusValue.done;
@@ -64,13 +77,11 @@ class _RunTaskState extends State<RunTask> {
 
   @override
   void dispose() {
-    taskStatus.status = TaskStatusValue.stopped;
-    if (taskStatus.startedAt != null) {
-      taskStatus.duration = (taskStatus.duration ?? const Duration()) +
-          DateTime.now().difference(taskStatus.lastRunAt!);
+    if (taskStatus.status == TaskStatusValue.started) {
+      _stop();
+      Storage.instance.updateTaskStatus(taskStatus);
     }
 
-    Storage.instance.updateTaskStatus(taskStatus);
     super.dispose();
   }
 
@@ -114,8 +125,11 @@ class _RunTaskUI extends StatelessWidget {
     final task = ModalRoute.of(context)!.settings.arguments as Task;
     final goal = storageRoot.findGoalById(task.goalId);
 
-    return Card(
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(goal.name),
+      ),
+      body: Column(
         children: [
           Expanded(
             flex: 1,
@@ -226,22 +240,12 @@ class _InfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      goal.name,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 3,
-                      style: TextStyle(
-                        color: colorScheme.secondary,
-                        fontSize: 20.0,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
                       task.name,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
                       style: TextStyle(
                         color: colorScheme.secondary,
-                        fontSize: 16.0,
+                        fontSize: 20.0,
                       ),
                     ),
                   ],
@@ -255,7 +259,7 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-class _StartStopCard extends StatelessWidget {
+class _StartStopCard extends StatefulWidget {
   const _StartStopCard(
       {required this.task, required this.onStart, required this.onStop});
 
@@ -264,11 +268,33 @@ class _StartStopCard extends StatelessWidget {
   final Function() onStop;
 
   @override
+  State<_StartStopCard> createState() => _StartStopCardState();
+}
+
+class _StartStopCardState extends State<_StartStopCard> {
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     late final colorScheme = Theme.of(context).colorScheme;
     late final backgroundColor = Color.alphaBlend(
         colorScheme.secondary.withOpacity(0.14), colorScheme.surface);
-    late final textStyle = TextStyle(color: colorScheme.secondary);
+    final taskStatus = widget.task.status!;
+    final elapsed = (taskStatus.duration ?? const Duration()) +
+        (taskStatus.status == TaskStatusValue.started
+            ? DateTime.now().difference(taskStatus.lastRunAt!)
+            : Duration());
+
+    if (taskStatus.status == TaskStatusValue.started) {
+      _timer =
+          Timer.periodic(const Duration(seconds: 1), (_) => setState(() => {}));
+    }
 
     return Card(
       color: backgroundColor,
@@ -284,26 +310,30 @@ class _StartStopCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text('Keep track of how long the task takes'),
+                    const Text('Keep track of how long the task takes:'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        if (task.status!.status == TaskStatusValue.ready ||
-                            task.status!.status == TaskStatusValue.stopped)
+                        if (taskStatus.status == TaskStatusValue.ready ||
+                            taskStatus.status == TaskStatusValue.stopped)
                           ElevatedButton.icon(
-                            onPressed: onStart,
+                            onPressed: widget.onStart,
                             icon: const Icon(Icons.start),
                             label: const Text('Start'),
                           ),
-                        if (task.status!.status == TaskStatusValue.started)
+                        if (taskStatus.status == TaskStatusValue.started)
                           ElevatedButton.icon(
-                            onPressed: onStop,
+                            onPressed: widget.onStop,
                             icon: const Icon(Icons.stop),
                             label: const Text('Stop'),
                           ),
                       ],
-                    )
+                    ),
+                    Text(
+                      timeFormatter(elapsed),
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ],
                 ),
               ),
@@ -534,9 +564,6 @@ class _TimeboxCardState extends State<_TimeboxCard>
     }
     super.reassemble();
   }
-
-  var timeFormatter = (Duration d) =>
-      "${d.inMinutes.toString().padLeft(2, '0')}:${d.inSeconds.remainder(60).toString().padLeft(2, '0')}";
 
   @override
   Widget build(BuildContext context) {

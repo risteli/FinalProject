@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../models/models.dart';
 
 class GoalsRunnerGoalTile extends StatefulWidget {
@@ -74,12 +74,6 @@ class _TileContentState extends State<_TileContent> {
   late final ColorScheme _colorScheme = Theme.of(context).colorScheme;
   late final TextTheme _textTheme = Theme.of(context).textTheme;
 
-  Widget get contentSpacer => SizedBox(height: 2);
-
-  String get activeTasksCounterLabel {
-    return 'Active tasks: ${widget.goal.tasks.length}';
-  }
-
   TextStyle? get contentTextStyle => switch (widget) {
     _TileContent(isSelected: true) => _textTheme.bodyMedium
             ?.copyWith(color: _colorScheme.onPrimaryContainer),
@@ -89,6 +83,9 @@ class _TileContentState extends State<_TileContent> {
 
   @override
   Widget build(BuildContext context) {
+    final statusCount = widget.goal.countTasksByStatus();
+    final int totalTasks = widget.goal.tasks.length;
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -98,6 +95,23 @@ class _TileContentState extends State<_TileContent> {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      value: totalTasks > 0? (statusCount[TaskStatusValue.done]! / totalTasks): 0,
+                      color: _colorScheme.primary.withOpacity(0.80),
+                      backgroundColor: _colorScheme.primary.withOpacity(0.40),
+                    ),
+                    Center(
+                      child: Icon(
+                        widget.goal.goalType?.icon,
+                        color: _colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,19 +122,9 @@ class _TileContentState extends State<_TileContent> {
                         maxLines: 1,
                         style: widget.isSelected
                             ? _textTheme.labelMedium?.copyWith(
-                                color: _colorScheme.onSecondaryContainer)
+                                color: _colorScheme.onSecondaryContainer, fontSize: 16)
                             : _textTheme.labelMedium
-                                ?.copyWith(color: _colorScheme.onSurface),
-                      ),
-                      Text(
-                        activeTasksCounterLabel,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        style: widget.isSelected
-                            ? _textTheme.labelMedium?.copyWith(
-                                color: _colorScheme.onSecondaryContainer)
-                            : _textTheme.labelMedium?.copyWith(
-                                color: _colorScheme.onSurfaceVariant),
+                                ?.copyWith(color: _colorScheme.onSurface, fontSize: 16),
                       ),
                     ],
                   ),

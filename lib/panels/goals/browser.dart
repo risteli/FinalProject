@@ -31,13 +31,20 @@ class _GoalBrowserViewState extends State<GoalBrowserView> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ListView(
         children: [
-          Text(
-            "Your goals",
-            style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "Your goals",
+              style: TextStyle(fontSize: 32.0, color: _colorScheme.onSurface),
+            ),
           ),
-          Text(
-            "Start planning your goals, task by task.",
-            style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "Start planning your goals, task by task.",
+              style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
+            ),
           ),
           const SizedBox(height: 8),
           _GoalBrowserList(

@@ -77,6 +77,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
                   builder: (_) {
                     return GoalsRunnerTasks(
                       goal: storageRoot.goals[newSelectedIndex!],
+                      singlePanel: true,
                       onSelected: routeToRunner,
                     );
                   },
@@ -95,6 +96,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
           ),
           doubleLayoutRight: GoalsRunnerTasks(
             goal: storageRoot.goals[selectedIndex!],
+            singlePanel: false,
             onSelected: routeToRunner,
           ),
         );

@@ -68,8 +68,8 @@ class Storage {
     if (taskIds.isNotEmpty) {
       var records = await db.query(
         AppDatabase.taskStatusTable,
-        where: 'task_id IN (?)',
-        whereArgs: [List.filled(taskIds.length, '?').join(',')],
+        where: 'task_id IN (${List.filled(taskIds.length, '?').join(',')})',
+        whereArgs: taskIds,
       );
 
       var taskStatusByTask = <int, TaskStatus>{};
