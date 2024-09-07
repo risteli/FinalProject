@@ -23,7 +23,6 @@ class Config {
         defaultCooldown =
             Duration(minutes: int.parse(configMap[configDefaultCooldown]!));
 
-
   @override
   String toString() {
     return "Config(defaultTimebox=$defaultTimebox,defaultCooldown=$defaultCooldown)";
@@ -43,6 +42,7 @@ class StorageRoot extends ChangeNotifier {
         _config = Config();
 
   UnmodifiableListView<Goal> get goals => UnmodifiableListView(_goals);
+
   Config get config => _config;
 
   int get goalsLength => _goals.length;
@@ -53,7 +53,7 @@ class StorageRoot extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setConfig(Map<String,String> configMap) {
+  void setConfig(Map<String, String> configMap) {
     _config = Config.fromMap(configMap);
   }
 
@@ -85,7 +85,48 @@ class StorageRoot extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updated() {
-    notifyListeners();
+  int countTasks() {
+    int result = 0;
+
+    for (var goal in _goals) {
+      result += goal.tasks.length;
+    }
+
+    return result;
+  }
+
+  Map<GoalType, int> countByGoalType() {
+    Map<GoalType, int> result = {for (var goalType in GoalType.values) goalType: 0};
+
+    for (var goal in _goals) {
+      result[goal.goalType!] = result[goal.goalType!]! + 1;
+    }
+
+    return result;
+  }
+
+  Map<GoalType, int> completedTasksByGoalType() {
+    Map<GoalType, int> result = {for (var goalType in GoalType.values) goalType: 0};
+
+    for (var goal in _goals) {
+      for (var task in goal.tasks) {
+        if (task.status!.status == TaskStatusValue.done) {
+          result[goal.goalType!] = result[goal.goalType!]! + 1;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  Duration totalElapsed() {
+    Duration result = const Duration();
+
+    for (var goal in _goals) {
+      for (var task in goal.tasks) {
+        result += task.status?.duration ?? const Duration();
+      }
+    }
+    return result;
   }
 }

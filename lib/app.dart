@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:final_project/panels/achiev/panel.dart';
 import 'package:final_project/panels/goals/panel.dart';
 import 'package:final_project/repository/loader.dart';
 import 'package:final_project/panels/runner/panel.dart';
@@ -49,7 +50,7 @@ class _AppState extends State<App> {
     const Destination(
       icon: Icons.emoji_events_outlined,
       label: 'Achievements',
-      widget: Text('Achiev placeholder'),
+      widget: AchievPanel(),
     ),
   ];
 
