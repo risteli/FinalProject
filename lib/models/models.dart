@@ -94,8 +94,20 @@ class Task {
     this.goalId,
     this.position = 0,
     this.repeatable = false,
-    this.status,
-  });
+    status = TaskStatusValue.ready,
+    startedAt,
+    lastRunAt,
+    duration,
+    timebox,
+    cooldown,
+  }): status = TaskStatus(
+    status: status,
+    startedAt: startedAt,
+    lastRunAt: lastRunAt,
+    duration: duration,
+    timebox: timebox,
+    cooldown: cooldown,
+  );
 
   late String name;
 
@@ -103,7 +115,7 @@ class Task {
   int? goalId;
   int position = 0;
   bool repeatable = false;
-  TaskStatus? status;
+  TaskStatus status;
 
   Map<String, Object?> toMap() {
     return {
@@ -114,7 +126,7 @@ class Task {
     };
   }
 
-  Task.fromMap(Map<String, Object?> map) {
+  Task.fromMap(Map<String, Object?> map): status = TaskStatus() {
     id = map['id'] as int?;
     goalId = map['goal_id'] as int?;
     name = map['name'] as String;
@@ -141,13 +153,15 @@ enum TaskStatusValue {
 
 class TaskStatus {
   TaskStatus({
-    required this.taskId,
+    this.status = TaskStatusValue.ready,
     this.startedAt,
     this.lastRunAt,
+    this.duration,
+    this.timebox,
+    this.cooldown,
   });
 
-  late final int taskId;
-  TaskStatusValue status = TaskStatusValue.ready;
+  TaskStatusValue status;
   DateTime? startedAt;
   DateTime? lastRunAt;
   Duration? duration;
@@ -156,7 +170,6 @@ class TaskStatus {
 
   Map<String, Object?> toMap() {
     return {
-      'task_id': taskId,
       'status': status.value,
       'started_at': startedAt?.millisecondsSinceEpoch,
       'last_run_at': lastRunAt?.millisecondsSinceEpoch,
@@ -166,9 +179,8 @@ class TaskStatus {
     };
   }
 
-  TaskStatus.fromMap(Map<String, Object?> map) {
-    taskId = map['task_id'] as int;
-
+  TaskStatus.fromMap(Map<String, Object?> map)
+      : status = TaskStatusValue.ready {
     status = map['status'] == null
         ? TaskStatusValue.ready
         : TaskStatusValue.values.byName(map['status'] as String);
@@ -192,6 +204,6 @@ class TaskStatus {
 
   @override
   String toString() {
-    return "TaskStatus(task_id=$taskId, status=$status)";
+    return "TaskStatus(status=$status)";
   }
 }

@@ -9,7 +9,7 @@ import 'app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  AppDatabaseInit.init().then((db) {
+  AppDatabaseInit.init(resetDatabase: true).then((db) {
     Storage();
     runApp(const MainApp());
   });

@@ -11,7 +11,7 @@ class AchievPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late StorageRoot storageRoot = Provider.of<StorageRoot>(context);
+    late StorageRoot storageRoot = Provider.of<StorageRoot>(context, listen: false);
 
     const goalTotalGoals = 20;
 

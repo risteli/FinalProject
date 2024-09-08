@@ -98,6 +98,7 @@ class AppDatabaseMigrations {
         goal.tasks[j].goalId = goal.id;
         goal.tasks[j].position = j;
         batch.insert(AppDatabase.tasksTable, goal.tasks[j].toMap());
+        batch.insert(AppDatabase.taskStatusTable, goal.tasks[j].status.toMap());
       }
       ids = await batch.commit();
 
@@ -109,16 +110,19 @@ class AppDatabaseMigrations {
 }
 
 class AppDatabaseInit {
+  static const databaseName = 'taskchisel.db';
+
   AppDatabaseInit._privateConstructor();
 
   late final Database _database;
 
-  static Future<AppDatabase> init() async {
-    String dbName = join(await getDatabasesPath(), 'taskchisel.db');
+  static Future<AppDatabase> init({bool resetDatabase = false}) async {
+    String dbName = join(await getDatabasesPath(), databaseName);
 
-    if (false) // enable to drop the db and rebuild it from the fixture. There are better ways to do this.
+    if (resetDatabase) {
       await databaseExists(dbName)
           .then((exists) => exists ? deleteDatabase(dbName) : null);
+    }
 
     final database = await openDatabase(
       dbName,

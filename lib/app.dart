@@ -58,7 +58,8 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000;
+    bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000 &&
+        MediaQuery.of(context).size.height.toInt() >= 800;
 
     return StorageAsyncLoader(
       child: Scaffold(
@@ -77,9 +78,10 @@ class _AppState extends State<App> {
               Expanded(
                 child: Container(
                   color: _backgroundColor,
-                  child: (0 <= currentIndex && currentIndex < destinations.length)
-                      ? destinations[currentIndex].widget
-                      : const Text('invalid page index'),
+                  child:
+                      (0 <= currentIndex && currentIndex < destinations.length)
+                          ? destinations[currentIndex].widget
+                          : const Text('invalid page index'),
                 ),
               ),
             ],

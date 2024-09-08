@@ -75,15 +75,15 @@ class Storage {
       var taskStatusByTask = <int, TaskStatus>{};
       for (var record in records) {
         var taskStatus = TaskStatus.fromMap(record);
-        taskStatusByTask[taskStatus.taskId] = taskStatus;
+        taskStatusByTask[record['task_id'] as int] = taskStatus;
       }
 
       for (var goal in root.goals) {
         for (var task in goal.tasks) {
           if (taskStatusByTask.containsKey(task.id!)) {
-            task.status = taskStatusByTask[task.id!];
+            task.status = taskStatusByTask[task.id!]!;
           } else {
-            task.status = TaskStatus(taskId: task.id!);
+            task.status = TaskStatus();
           }
         }
       }
