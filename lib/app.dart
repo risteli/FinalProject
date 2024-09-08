@@ -58,8 +58,8 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    bool doubleRail = MediaQuery.of(context).size.width.toInt() >= 1000 &&
-        MediaQuery.of(context).size.height.toInt() >= 800;
+    final Size size = MediaQuery.of(context).size;
+    final doubleRail = size.width.toInt() >= 1000 && size.height.toInt() >= 500;
 
     return StorageAsyncLoader(
       child: Scaffold(
