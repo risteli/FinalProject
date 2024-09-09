@@ -177,14 +177,12 @@ class _GoalSlideNameState extends State<_GoalSlideName> {
             style: TextStyle(fontSize: 16.0, color: _colorScheme.onSurface),
           ),
         ),
-        const SizedBox(height: 8),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 18),
         const Padding(
           padding: EdgeInsets.only(left: 12.0),
           child: Text('What do you want to accomplish?'),
         ),
+        const SizedBox(height: 8),
         TextField(
           controller: nameController,
           decoration: const InputDecoration(
@@ -202,6 +200,7 @@ class _GoalSlideNameState extends State<_GoalSlideName> {
           padding: EdgeInsets.only(left: 12.0),
           child: Text('What best describes your goal?'),
         ),
+        const SizedBox(height: 8),
         SegmentedButton<GoalType>(
           segments: <ButtonSegment<GoalType>>[
             ...GoalType.values.map(
@@ -227,6 +226,7 @@ class _GoalSlideNameState extends State<_GoalSlideName> {
           padding: EdgeInsets.only(left: 12.0),
           child: Text('Is there a deadline for this goal?'),
         ),
+        const SizedBox(height: 8),
         TextField(
           controller: deadlineController,
           readOnly: true,

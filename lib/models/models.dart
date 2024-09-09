@@ -7,15 +7,15 @@ class Goal {
   Goal({
     this.name = '',
     this.goalType,
-    this.tasks = const [],
+    List<Task>? tasks,
     this.position = 0,
     this.deadline,
-  });
+  }) : tasks = tasks ?? [];
 
   int? id;
   late String name;
   GoalType? goalType;
-  List<Task> tasks = [];
+  List<Task> tasks;
   int position = 0;
   DateTime? deadline;
 
@@ -28,7 +28,7 @@ class Goal {
     };
   }
 
-  Goal.fromMap(Map<String, Object?> map) {
+  Goal.fromMap(Map<String, Object?> map) : tasks = [] {
     id = map['id'] as int?;
     name = map['name'] as String;
     position = map['position'] as int;
@@ -94,20 +94,8 @@ class Task {
     this.goalId,
     this.position = 0,
     this.repeatable = false,
-    status = TaskStatusValue.ready,
-    startedAt,
-    lastRunAt,
-    duration,
-    timebox,
-    cooldown,
-  }): status = TaskStatus(
-    status: status,
-    startedAt: startedAt,
-    lastRunAt: lastRunAt,
-    duration: duration,
-    timebox: timebox,
-    cooldown: cooldown,
-  );
+    TaskStatus? status,
+  }) : status = status ?? TaskStatus();
 
   late String name;
 
@@ -126,7 +114,7 @@ class Task {
     };
   }
 
-  Task.fromMap(Map<String, Object?> map): status = TaskStatus() {
+  Task.fromMap(Map<String, Object?> map) : status = TaskStatus() {
     id = map['id'] as int?;
     goalId = map['goal_id'] as int?;
     name = map['name'] as String;
@@ -168,8 +156,9 @@ class TaskStatus {
   Duration? timebox;
   Duration? cooldown;
 
-  Map<String, Object?> toMap() {
+  Map<String, Object?> toMap(int taskId) {
     return {
+      'task_id': taskId,
       'status': status.value,
       'started_at': startedAt?.millisecondsSinceEpoch,
       'last_run_at': lastRunAt?.millisecondsSinceEpoch,

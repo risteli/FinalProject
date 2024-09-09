@@ -66,9 +66,10 @@ class _TaskListState extends State<TaskList> {
                   goalId: widget.goal.id,
                   position: tasks.length,
                 );
-                tasks.add(task);
                 newTaskController.clear();
                 Storage.instance.createTask(task);
+                tasks.add(task);
+                log('added task $task, list is $tasks');
               });
             },
           ),

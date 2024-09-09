@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../models/models.dart';
 
 class GoalsRunnerGoalTile extends StatefulWidget {
@@ -124,6 +125,17 @@ class _TileContentState extends State<_TileContent> {
                                 color: _colorScheme.onSecondaryContainer, fontSize: 16)
                             : _textTheme.labelMedium
                                 ?.copyWith(color: _colorScheme.onSurface, fontSize: 16),
+                      ),
+                      if (widget.goal.deadline != null)
+                      Text(
+                        'Deadline: ${DateFormat.yMMMEd().format(widget.goal.deadline!)}',
+                        overflow: TextOverflow.fade,
+                        maxLines: 1,
+                        style: widget.isSelected
+                            ? _textTheme.labelMedium?.copyWith(
+                            color: _colorScheme.onSecondaryContainer, fontSize: 11)
+                            : _textTheme.labelMedium
+                            ?.copyWith(color: _colorScheme.onSurface, fontSize: 11),
                       ),
                     ],
                   ),

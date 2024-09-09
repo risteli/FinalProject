@@ -108,6 +108,10 @@ class Storage {
     }
     var ids = await batch.commit();
 
+    for (var i =0; i<root.goals.length; i++) {
+      root.goals[i].id ??= ids[i] as int;
+    }
+
     var idsPlaceholders = List.filled(ids.length, '?').join(',');
 
     await db.update(
@@ -156,12 +160,12 @@ class Storage {
     task.id = await db.insert(AppDatabase.tasksTable, task.toMap());
   }
 
-  Future updateTaskStatus(TaskStatus taskStatus) async {
-    await db.insert(AppDatabase.taskStatusTable, taskStatus.toMap(),
+  Future updateTaskStatus(Task task, TaskStatus taskStatus) async {
+    await db.insert(AppDatabase.taskStatusTable, taskStatus.toMap(task.id!),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future addTaskToHistory(TaskStatus taskStatus) async {
-    await db.insert(AppDatabase.taskHistoryTable, taskStatus.toMap());
+  Future addTaskToHistory(Task task, TaskStatus taskStatus) async {
+    await db.insert(AppDatabase.taskHistoryTable, taskStatus.toMap(task.id!));
   }
 }

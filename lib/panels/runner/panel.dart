@@ -61,7 +61,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
     return Consumer<StorageRoot>(
       builder: (context, storageRoot, _) {
         routeToRunner(task) => widget.navigationStateKey.currentState!
-            .pushNamed(routeRunTask, arguments: task);
+            .pushNamed(routeRunTask, arguments: task).then((_) => setState(() => {}));
 
         return AppPanels(
           singleLayout: GoalsRunnerBrowser(
@@ -82,7 +82,7 @@ class _RunnableGoalsState extends State<_RunnableGoals> {
                     );
                   },
                 ),
-              );
+              ).then((_) => setState(() => {}));
             },
           ),
           doubleLayoutLeft: GoalsRunnerBrowser(

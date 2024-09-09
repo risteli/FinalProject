@@ -98,13 +98,15 @@ class AppDatabaseMigrations {
         goal.tasks[j].goalId = goal.id;
         goal.tasks[j].position = j;
         batch.insert(AppDatabase.tasksTable, goal.tasks[j].toMap());
-        batch.insert(AppDatabase.taskStatusTable, goal.tasks[j].status.toMap());
       }
       ids = await batch.commit();
 
+      batch = db.batch();
       for (var j = 0; j < goal.tasks.length; j++) {
         goal.tasks[j].id = ids[j] as int;
+        batch.insert(AppDatabase.taskStatusTable, goal.tasks[j].status.toMap(goal.tasks[j].id!));
       }
+      await batch.commit();
     }
   }
 }

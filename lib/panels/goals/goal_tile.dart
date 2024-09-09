@@ -127,7 +127,7 @@ class _GoalContentState extends State<_GoalContent> {
                     ),
                     if (widget.goal.deadline != null)
                       Text(
-                        'Deadline for this task: ${DateFormat.yMMMEd().format(widget.goal.deadline!)}',
+                        'Deadline: ${DateFormat.yMMMEd().format(widget.goal.deadline!)}',
                         style: textStyle,
                       ),
                   ],

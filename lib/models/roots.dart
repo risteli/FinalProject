@@ -41,7 +41,7 @@ class StorageRoot extends ChangeNotifier {
       : _goals = items,
         _config = Config();
 
-  UnmodifiableListView<Goal> get goals => UnmodifiableListView(_goals);
+  List<Goal> get goals => _goals;
 
   Config get config => _config;
 

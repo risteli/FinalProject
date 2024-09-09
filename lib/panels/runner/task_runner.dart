@@ -34,7 +34,7 @@ class _RunTaskState extends State<RunTask> {
     taskStatus.lastRunAt = DateTime.now();
     taskStatus.duration ??= const Duration();
 
-    Storage.instance.updateTaskStatus(taskStatus);
+    Storage.instance.updateTaskStatus(widget.task, taskStatus);
     runController.resume();
   }
 
@@ -48,7 +48,7 @@ class _RunTaskState extends State<RunTask> {
 
   void stop() {
     _stop();
-    Storage.instance.updateTaskStatus(taskStatus);
+    Storage.instance.updateTaskStatus(widget.task, taskStatus);
     runController.pause();
   }
 
@@ -64,14 +64,14 @@ class _RunTaskState extends State<RunTask> {
     }
 
     taskStatus.status = TaskStatusValue.done;
-    Storage.instance.updateTaskStatus(taskStatus);
-    Storage.instance.addTaskToHistory(taskStatus);
+    Storage.instance.updateTaskStatus(widget.task, taskStatus);
+    Storage.instance.addTaskToHistory(widget.task, taskStatus);
   }
 
   void restart() {
     if (taskStatus.status == TaskStatusValue.done && widget.task.repeatable) {
       taskStatus.status = TaskStatusValue.ready;
-      Storage.instance.updateTaskStatus(taskStatus);
+      Storage.instance.updateTaskStatus(widget.task, taskStatus);
     }
   }
 
@@ -79,7 +79,7 @@ class _RunTaskState extends State<RunTask> {
   void dispose() {
     if (taskStatus.status == TaskStatusValue.started) {
       _stop();
-      Storage.instance.updateTaskStatus(taskStatus);
+      Storage.instance.updateTaskStatus(widget.task, taskStatus);
     }
 
     super.dispose();
@@ -101,7 +101,7 @@ class _RunTaskState extends State<RunTask> {
         onRestart: () => setState(() => restart()),
         onSetTimebox: (duration) => setState(() {
           taskStatus.timebox = duration;
-          Storage.instance.updateTaskStatus(taskStatus);
+          Storage.instance.updateTaskStatus(widget.task, taskStatus);
         }),
       ),
     );
@@ -293,7 +293,11 @@ class _StartStopCardState extends State<_StartStopCard> {
 
     if (taskStatus.status == TaskStatusValue.started) {
       _timer =
-          Timer.periodic(const Duration(seconds: 1), (_) => setState(() => {}));
+          Timer.periodic(const Duration(seconds: 1), (_) {
+            if (mounted) {
+              setState(() => {});
+            }
+          });
     }
 
     return Card(

@@ -4,9 +4,26 @@ import '../models/roots.dart';
 var goalsFixture = StorageRoot.from(
   [
     Goal(name: 'Piano: Learn BWV772', goalType: GoalType.learning, tasks: [
-      Task(name: 'Harmonic analysis', status: TaskStatusValue.done),
-      Task(name: 'Left Hand Reading', repeatable: true, lastRunAt: DateTime(2024, 7, 10), status: TaskStatusValue.done, duration: Duration(minutes: 90)),
-      Task(name: 'Right Hand Reading', repeatable: true, lastRunAt: DateTime(2024, 7, 12), status: TaskStatusValue.stopped, duration: Duration(minutes: 43)),
+      Task(
+        name: 'Harmonic analysis',
+        status: TaskStatus(status: TaskStatusValue.done),
+      ),
+      Task(
+          name: 'Left Hand Reading',
+          repeatable: true,
+          status: TaskStatus(
+            lastRunAt: DateTime(2024, 7, 10),
+            status: TaskStatusValue.done,
+            duration: Duration(minutes: 90),
+          )),
+      Task(
+          name: 'Right Hand Reading',
+          repeatable: true,
+          status: TaskStatus(
+            lastRunAt: DateTime(2024, 7, 12),
+            status: TaskStatusValue.stopped,
+            duration: Duration(minutes: 43),
+          )),
       Task(name: 'Practice C Scale', repeatable: true),
       Task(name: 'Practice D Scale', repeatable: true),
       Task(name: 'Practice A minor Scale', repeatable: true),
@@ -17,8 +34,20 @@ var goalsFixture = StorageRoot.from(
         name: 'Read "Good Strategy Bad Strategy"',
         goalType: GoalType.learning,
         tasks: [
-          Task(name: 'Read Chapter 1', status: TaskStatusValue.done, lastRunAt: DateTime(2024, 7, 1), duration: Duration(minutes: 30)),
-          Task(name: 'Read Chapter 2', status: TaskStatusValue.done, lastRunAt: DateTime(2024, 7, 15), duration: Duration(minutes: 20)),
+          Task(
+            name: 'Read Chapter 1',
+            status: TaskStatus(
+                status: TaskStatusValue.done,
+                lastRunAt: DateTime(2024, 7, 1),
+                duration: Duration(minutes: 30)),
+          ),
+          Task(
+            name: 'Read Chapter 2',
+            status: TaskStatus(
+                status: TaskStatusValue.done,
+                lastRunAt: DateTime(2024, 7, 15),
+                duration: Duration(minutes: 20)),
+          ),
           Task(name: 'Read Chapter 3'),
           Task(name: 'Read Chapter 4'),
           Task(name: 'Self-Reflection on Bad Strategies'),
@@ -27,7 +56,9 @@ var goalsFixture = StorageRoot.from(
       name: 'Bake a traditional lemon pie',
       goalType: GoalType.building,
       tasks: [
-        Task(name: 'Buy ingredients', status: TaskStatusValue.done),
+        Task(
+            name: 'Buy ingredients',
+            status: TaskStatus(status: TaskStatusValue.done)),
         Task(name: 'Prepare dough'),
         Task(name: 'Press lemons'),
         Task(name: 'Mix all together'),
@@ -39,8 +70,14 @@ var goalsFixture = StorageRoot.from(
       name: 'Request German citizenship',
       goalType: GoalType.todo,
       tasks: [
-        Task(name: 'Talk with officials for guidelines', status: TaskStatusValue.done),
-        Task(name: 'Acquire documents', status: TaskStatusValue.done),
+        Task(
+          name: 'Talk with officials for guidelines',
+          status: TaskStatus(status: TaskStatusValue.done),
+        ),
+        Task(
+          name: 'Acquire documents',
+          status: TaskStatus(status: TaskStatusValue.done),
+        ),
         Task(name: 'Get B1 certificate'),
         Task(name: 'Compile forms'),
         Task(name: 'Send to Burgeramt'),

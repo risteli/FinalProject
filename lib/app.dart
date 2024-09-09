@@ -39,6 +39,7 @@ class _AppState extends State<App> {
       widget: GoalsPanel(
         topController: topController,
       ),
+      hasAddAction: true,
     ),
     Destination(
       icon: Icons.schedule_outlined,
@@ -87,7 +88,7 @@ class _AppState extends State<App> {
             ],
           ),
         ),
-        floatingActionButton: doubleRail
+        floatingActionButton: doubleRail || !destinations[currentIndex].hasAddAction
             ? null
             : AppFloatingActionButton(
                 onPressed: () => topController.create(),
